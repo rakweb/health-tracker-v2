@@ -6,8 +6,10 @@
   <title>Health Tracker</title>
   <meta name="theme-color" content="#0b1220">
 
-  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b1220'/%3E%3Cpath d='M10 42h12l6-18 9 27 6-15h8l4 8h10' fill='none' stroke='%234ba3ff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 
+  <!-- PWA manifest -->
   <link rel="manifest" href="data:application/manifest+json,{
     \"name\":\"Health Tracker\",
     \"short_name\":\"HealthTrack\",
@@ -18,7 +20,9 @@
     \"icons\":[{\"src\":\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b1220'/%3E%3Cpath d='M10 42h12l6-18 9 27 6-15h8l4 8h10' fill='none' stroke='%234ba3ff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\",\"sizes\":\"192x192\",\"type\":\"image/svg+xml\"}]
   }">
 
+  <!-- Libraries -->
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0/dist/chartjs-plugin-annotation.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
   <style>
@@ -34,30 +38,91 @@
       --ring: #2a3a58;
       --chip: #1a2440;
       --btn: #1a2842;
+      --btn-hover: #223152;
+      --card: #0e1628;
     }
-    * { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
-    header { position:sticky; top:0; background:rgba(11,18,32,0.9); backdrop-filter:blur(8px); border-bottom:1px solid var(--ring); padding:12px 16px; z-index:10; }
-    .wrap { max-width:1200px; margin:0 auto; padding:0 16px; }
-    h1 { font-size:1.8rem; margin:0.4rem 0; }
-    .toolbar { display:flex; flex-wrap:wrap; gap:10px; background:var(--panel); padding:12px; border-radius:10px; margin:16px 0; }
-    button, input, select { padding:8px 12px; border-radius:6px; border:1px solid #2a3a58; background:#0c1426; color:white; }
-    button { cursor:pointer; }
-    button.ok { background:#113c2d; border-color:#2f8f73; }
-    button.danger { background:#3a1216; border-color:#8e2b37; }
-    .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:1000; opacity:0; transition:opacity 0.3s; }
-    .modal-backdrop.show { display:flex; opacity:1; }
-    .modal { background:var(--card); border:1px solid var(--ring); border-radius:10px; width:92%; max-width:860px; max-height:90vh; overflow-y:auto; padding:16px; transform:scale(0.92); opacity:0; transition:all 0.32s cubic-bezier(0.34,1.56,0.64,1); }
-    .modal-backdrop.show .modal { transform:scale(1); opacity:1; }
-    .row { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; }
-    label { display:block; font-size:0.85rem; color:var(--muted); margin-bottom:4px; }
-    input, select, textarea { width:100%; padding:9px; border-radius:6px; border:1px solid #2a3a58; background:#0c1426; color:white; }
-    .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
-    .chip { background:#1a2440; border:1px solid #2a3a58; border-radius:999px; padding:5px 11px; font-size:0.85rem; display:flex; align-items:center; gap:6px; }
-    .chip button { background:none; border:none; color:#ff5c5c; font-weight:bold; cursor:pointer; }
-    table { width:100%; border-collapse:collapse; margin:16px 0; background:var(--panel); border-radius:10px; overflow:hidden; }
-    th, td { padding:10px; text-align:left; border-bottom:1px solid #1f2a45; }
-    th { background:#0a1426; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(11, 18, 32, 0.9);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--ring);
+      padding: 12px 16px;
+    }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+    h1 { font-size: 1.8rem; margin: 0.5rem 0; }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: var(--panel);
+      padding: 12px;
+      border-radius: 10px;
+      margin: 16px 0;
+    }
+    button, input, select, textarea {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #2a3a58;
+      background: #0c1426;
+      color: white;
+    }
+    button { cursor: pointer; }
+    button.ok { background: #113c2d; border-color: #2f8f73; }
+    button.danger { background: #3a1216; border-color: #8e2b37; }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .modal-backdrop.show { display: flex; opacity: 1; }
+    .modal {
+      background: var(--card);
+      border: 1px solid var(--ring);
+      border-radius: 10px;
+      width: 92%;
+      max-width: 860px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 16px;
+      transform: scale(0.92);
+      opacity: 0;
+      transition: all 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .modal-backdrop.show .modal { transform: scale(1); opacity: 1; }
+    .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
+    input, select, textarea { width: 100%; padding: 9px; border-radius: 6px; border: 1px solid #2a3a58; background: #0c1426; color: white; }
+    .field-full { grid-column: 1 / -1; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .chip {
+      background: #1a2440;
+      border: 1px solid #2a3a58;
+      border-radius: 999px;
+      padding: 5px 11px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .chip button { background: none; border: none; color: #ff5c5c; font-weight: bold; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; background: var(--panel); border-radius: 10px; overflow: hidden; }
+    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #1f2a45; }
+    th { background: #0a1426; }
   </style>
 </head>
 <body>
@@ -111,8 +176,8 @@
       <div><label>Date *</label><input type="date" id="f_date" required></div>
       <div><label>Time</label><input type="time" id="f_time"></div>
       <div><label>Glucose (mg/dL)</label><input type="number" id="f_glucose" step="any"></div>
-      <div><label>Systolic</label><input type="number" id="f_sys"></div>
-      <div><label>Diastolic</label><input type="number" id="f_dia"></div>
+      <div><label>Systolic (mmHg)</label><input type="number" id="f_sys"></div>
+      <div><label>Diastolic (mmHg)</label><input type="number" id="f_dia"></div>
       <div><label>SpO₂ (%)</label><input type="number" id="f_spo2" min="0" max="100" step="0.1"></div>
       <div><label>Heart Rate (bpm)</label><input type="number" id="f_hr"></div>
       <div><label>Weight (lbs)</label><input type="number" id="f_weightLbs" step="0.1" oninput="calcBMI()"></div>
@@ -220,10 +285,7 @@ async function deleteEntry(id) {
 let editId = null;
 let meds = [];
 
-// ─────────────────────────────────────────────
 // Real-time BMI
-// ─────────────────────────────────────────────
-
 function calcBMI() {
   const w = parseFloat(document.getElementById('f_weightLbs')?.value) || 0;
   const h = parseFloat(document.getElementById('f_heightIn')?.value) || 0;
@@ -232,10 +294,7 @@ function calcBMI() {
   if (bmiEl) bmiEl.value = bmi;
 }
 
-// ─────────────────────────────────────────────
 // Render table
-// ─────────────────────────────────────────────
-
 async function renderTable() {
   const tbody = document.getElementById('tableBody');
   if (!tbody) return;
@@ -265,10 +324,7 @@ async function renderTable() {
   });
 }
 
-// ─────────────────────────────────────────────
-// Modal open/close
-// ─────────────────────────────────────────────
-
+// Open modal
 function openEntry(id = null, data = {}) {
   editId = id;
   meds = data.meds ? [...data.meds] : [];
@@ -287,7 +343,6 @@ function openEntry(id = null, data = {}) {
   calcBMI();
 
   renderMeds();
-
   document.getElementById('entryModal').classList.add('show');
 }
 
@@ -321,33 +376,7 @@ function closeModal() {
   }, 350);
 }
 
-// ─────────────────────────────────────────────
-// Event Listeners
-// ─────────────────────────────────────────────
-
-document.getElementById('btnAdd').addEventListener('click', () => openEntry());
-
-document.getElementById('btnRefresh').addEventListener('click', renderTable);
-
-document.getElementById('btnExportCSV').addEventListener('click', async () => {
-  const entries = await getAllEntries();
-  if (!entries.length) return alert('No data to export');
-
-  let csv = 'date,time,glucose,sys,dia,spo2,hr,weightLbs,heightIn,waistIn,bmi,tempF,lungFluidCc,resp,sleep,steps,stress,bodyBattery,pain,emotions,comments,meds\n';
-  entries.forEach(e => {
-    const medsStr = (e.meds||[]).map(m => `${m.name} ${m.dose||''}${m.unit?' '+m.unit:''}`).join('; ');
-    csv += `${e.date||''},${e.time||''},${e.glucose??''},${e.sys??''},${e.dia??''},${e.spo2??''},${e.hr??''},${e.weightLbs??''},${e.heightIn??''},${e.waistIn??''},${e.bmi??''},${e.tempF??''},${e.lungFluidCc??''},${e.resp??''},${e.sleep??''},${e.steps??''},${e.stress??''},${e.bodyBattery??''},${e.pain??''},"${(e.emotions||'').replace(/"/g,'""')}","${(e.comments||'').replace(/"/g,'""')}","${medsStr.replace(/"/g,'""')}"\n`;
-  });
-
-  const blob = new Blob([csv], {type:'text/csv'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'health-tracker.csv';
-  a.click();
-  URL.revokeObjectURL(url);
-});
-
+// Save
 document.getElementById('btnSaveEntry').addEventListener('click', async e => {
   e.preventDefault();
   e.stopPropagation();
@@ -394,27 +423,36 @@ document.getElementById('btnSaveEntry').addEventListener('click', async e => {
   }
 });
 
+// Other buttons
+document.getElementById('btnAdd').addEventListener('click', () => openEntry());
+document.getElementById('btnRefresh').addEventListener('click', renderTable);
+document.getElementById('btnExportCSV').addEventListener('click', async () => {
+  const entries = await getAllEntries();
+  if (!entries.length) return alert('No data to export');
+
+  let csv = 'date,time,glucose,sys,dia,spo2,hr,weightLbs,heightIn,waistIn,bmi,tempF,lungFluidCc,resp,sleep,steps,stress,bodyBattery,pain,emotions,comments,meds\n';
+  entries.forEach(e => {
+    const medsStr = (e.meds||[]).map(m => `${m.name} ${m.dose||''}${m.unit?' '+m.unit:''}`).join('; ');
+    csv += `${e.date||''},${e.time||''},${e.glucose??''},${e.sys??''},${e.dia??''},${e.spo2??''},${e.hr??''},${e.weightLbs??''},${e.heightIn??''},${e.waistIn??''},${e.bmi??''},${e.tempF??''},${e.lungFluidCc??''},${e.resp??''},${e.sleep??''},${e.steps??''},${e.stress??''},${e.bodyBattery??''},${e.pain??''},"${(e.emotions||'').replace(/"/g,'""')}","${(e.comments||'').replace(/"/g,'""')}","${medsStr.replace(/"/g,'""')}"\n`;
+  });
+
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'health-tracker.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
 document.getElementById('btnAddMed').addEventListener('click', () => {
   const name = document.getElementById('medName').value.trim();
   if (!name) return;
-  meds.push({
-    name,
-    dose: document.getElementById('medDose').value.trim() || null,
-    unit: document.getElementById('medUnit').value.trim() || null
-  });
+  meds.push({name, dose:document.getElementById('medDose').value.trim()||null, unit:document.getElementById('medUnit').value.trim()||null});
   document.getElementById('medName').value = '';
   document.getElementById('medDose').value = '';
   document.getElementById('medUnit').value = '';
   renderMeds();
-});
-
-document.getElementById('btnDeleteEntry').addEventListener('click', async e => {
-  e.preventDefault(); e.stopPropagation();
-  if (editId && confirm('Delete permanently?')) {
-    await deleteEntry(editId);
-    closeModal();
-    renderTable();
-  }
 });
 
 document.getElementById('entryModal').addEventListener('click', e => {
