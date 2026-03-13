@@ -2,6 +2,7 @@
   "name": "Health Tracker",
   "short_name": "HealthTrack",
   "start_url": "./",
+  "id": "/health-tracker-v2/",
   "display": "standalone",
   "background_color": "#0b1220",
   "theme_color": "#0b1220",
