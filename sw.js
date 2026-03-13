@@ -1,4 +1,4 @@
-const CACHE = 'health-tracker-v1';
+const CACHE = 'health-tracker-v2';
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(cache => cache.addAll(['./index.html'])).then(() => self.skipWaiting()));
