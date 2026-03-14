@@ -1,4 +1,4 @@
-const CACHE = 'health-tracker-v2';
+const CACHE_NAME = 'health-tracker-v2';
 
 self.addEventListener('install', e => {
   e.waitUntil(
