@@ -103,7 +103,8 @@ window.addEventListener('appinstalled', () => {
 /* ==================== App data & defaults ==================== */
 // NOTE: Symptoms is included as a full metric.
 const METRICS = [
-  { key: 'bodyBattery', label: 'Body Battery', unit: '', type: 'number' },
+  { key: 'HighbodyBattery', label: 'High Body Battery', unit: '', type: 'number' },
+  { key: 'LowbodyBattery', label: 'Low Body Battery', unit: '', type: 'number' },
   { key: 'stress', label: 'Stress', unit: '', type: 'number' },
   { key: 'weightLbs', label: 'Weight (lbs)', unit: 'lbs', type: 'number' },
   { key: 'heightIn', label: 'Height (in)', unit: 'in', type: 'number' },
@@ -130,8 +131,8 @@ const CORE_FIELDS = ['date', 'time', ...METRICS.map(m => m.key)];
 // IMPORTANT: This file does not decide what you want visible-by-default.
 // Keep your existing DEFAULT_FIELDS_VISIBLE values in index.html or set them here.
 const DEFAULT_FIELDS_VISIBLE = [
-  'date', 'time', 'glucose', 'sys', 'dia', 'spo2', 'hr',
-  'weightLbs', 'heightIn', 'waistIn', 'sleep', 'steps',
+  'date', 'time', 'sys', 'dia', 'spo2', 'hr',
+  'weightLbs', 'heightIn', 'waistIn', 'sleep', 'steps', 'glucose',
   'pain', 'emotions', 'comments'
 ];
 
@@ -142,7 +143,8 @@ const DEFAULT_THRESHOLDS = {
   hr: { warnLow: 45, bandLow: 50, bandHigh: 90, warnHigh: 120 },
   tempF: { warnLow: 95, bandLow: 97, bandHigh: 99, warnHigh: 101 },
   stress: { warnLow: 0, bandLow: 0, bandHigh: 40, warnHigh: 75 },
-  bodyBattery: { warnLow: 15, bandLow: 20, bandHigh: 100, warnHigh: 999 },
+  highbodyBattery: { warnLow: 15, bandLow: 20, bandHigh: 100, warnHigh: 100 },
+  lowbodyBattery: { warnLow: 5, bandLow: 15, bandHigh: 25, warnHigh: 100 },
   lungFluidCc: { warnLow: -1, bandLow: 0, bandHigh: 50, warnHigh: 200 },
   weightLbs: { warnLow: 0, bandLow: 0, bandHigh: 999, warnHigh: 9999 },
   resp: { warnLow: 8, bandLow: 10, bandHigh: 20, warnHigh: 24 },
