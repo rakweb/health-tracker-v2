@@ -152,29 +152,25 @@ function previewChart() {
 /* ==================== INIT ==================== */
 
 document.addEventListener('DOMContentLoaded', async () => {
-  await Actions.load();
-  bindEvents();
+  console.log('DOM loaded');   // ✅ debug
+
+  registerSW?.();
+
+  await Actions.init();
+
+  bindUI();   // ✅ MUST RUN
+
 });
 
-import { Actions } from './actions.js';
-import * as UI from './ui.js';
-
-window.Actions = Actions;
-window.UI = UI;
+/*===== temp====*/
 
 function bindUI() {
-  document.getElementById('btnAdd')?.addEventListener('click', () => UI.openEntry());
-  document.getElementById('btnSaveCSV')?.addEventListener('click', Actions.exportCSV);
-  document.getElementById('btnSavePDF')?.addEventListener('click', Actions.exportPDF);
-  document.getElementById('btnRefresh')?.addEventListener('click', render);
+  console.log('Binding UI...');   // ✅ debug
 
-  document.getElementById('chartMetrics')?.addEventListener('change', render);
+  document.getElementById('btnAdd')?.addEventListener('click', () => {
+    console.log('btnAdd clicked');
+    UI.openEntry(null);
+  });
 }
 
-async function init() {
-  await DB.open();
-  State.entries = await DB.getAll();
 
-  bindUI();   // ✅ REQUIRED
-  render();
-}
