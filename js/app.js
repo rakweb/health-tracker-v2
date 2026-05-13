@@ -155,3 +155,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   await Actions.load();
   bindEvents();
 });
+
+import { Actions } from './actions.js';
+import * as UI from './ui.js';
+
+window.Actions = Actions;
+window.UI = UI;
+
+function bindUI() {
+  document.getElementById('btnAdd')?.addEventListener('click', () => UI.openEntry());
+  document.getElementById('btnSaveCSV')?.addEventListener('click', Actions.exportCSV);
+  document.getElementById('btnSavePDF')?.addEventListener('click', Actions.exportPDF);
+  document.getElementById('btnRefresh')?.addEventListener('click', render);
+
+  document.getElementById('chartMetrics')?.addEventListener('change', render);
+}
+
+async function init() {
+  await DB.open();
+  State.entries = await DB.getAll();
+
+  bindUI();   // ✅ REQUIRED
+  render();
+}
