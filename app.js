@@ -103,8 +103,8 @@ window.addEventListener('appinstalled', () => {
 /* ==================== App data & defaults ==================== */
 // NOTE: Symptoms is included as a full metric.
 const METRICS = [
-  { key: 'HighbodyBattery', label: 'High Body Battery', unit: '', type: 'number' },
-  { key: 'LowbodyBattery', label: 'Low Body Battery', unit: '', type: 'number' },
+  { key: 'highbodyBattery', label: 'High Body Battery', unit: '', type: 'number' },
+  { key: 'lowbodyBattery', label: 'Low Body Battery', unit: '', type: 'number' },
   { key: 'stress', label: 'Stress', unit: '', type: 'number' },
   { key: 'weightLbs', label: 'Weight (lbs)', unit: 'lbs', type: 'number' },
   { key: 'heightIn', label: 'Height (in)', unit: 'in', type: 'number' },
@@ -407,7 +407,8 @@ const UI = {
     assess('hr', latest.hr, 'HR');
     assess('resp', latest.resp, 'Resp');
     assess('stress', latest.stress, 'Stress');
-    assess('bodyBattery', latest.bodyBattery, 'Body Battery');
+    assess('highbodyBattery', latest.highbodyBattery, 'High Body Battery');
+	assess('lowbodyBattery', latest.lowbodyBattery, 'Low Body Battery');
     assess('lungFluidCc', latest.lungFluidCc, 'Lung Fluid');
     assess('sleep', latest.sleep, 'Sleep');
     assess('steps', latest.steps, 'Steps');
@@ -565,7 +566,8 @@ const UI = {
       document.getElementById('f_date').value = en.date || '';
       document.getElementById('f_time').value = en.time || '';
 
-      map('f_bodyBattery', en.bodyBattery);
+      map('f_highbodyBattery', en.highbodyBattery);
+	  map('f_lowbodyBattery', en.lowbodyBattery);
       map('f_stress', en.stress);
       map('f_weightLbs', en.weightLbs);
       map('f_heightIn', en.heightIn);
@@ -604,7 +606,7 @@ const UI = {
       const d = document.getElementById('f_date'); if (d) d.value = U.toISODate(new Date());
       const t = document.getElementById('f_time'); if (t) t.value = new Date().toTimeString().slice(0, 5);
 
-      ['bodyBattery', 'stress', 'weightLbs', 'heightIn', 'waistIn', 'tempF', 'lungFluidCc', 'sys', 'dia', 'spo2', 'hr', 'resp', 'sleep', 'steps', 'glucose']
+      ['highbodyBattery', 'lowbodyBattery', 'stress', 'weightLbs', 'heightIn', 'waistIn', 'tempF', 'lungFluidCc', 'sys', 'dia', 'spo2', 'hr', 'resp', 'sleep', 'steps', 'glucose']
         .forEach(k => {
           const el = document.getElementById('f_' + k);
           if (el) el.value = '';
@@ -668,7 +670,7 @@ const UI = {
 
     host.innerHTML = '';
 
-    const keys = ['glucose', 'sys', 'dia', 'spo2', 'hr', 'tempF', 'stress', 'bodyBattery', 'lungFluidCc', 'resp', 'sleep', 'steps', 'pain', 'symptoms', 'bmi', 'whtr'];
+    const keys = ['glucose', 'sys', 'dia', 'spo2', 'hr', 'tempF', 'stress', 'highbodyBattery',  'lowbodyBattery', 'lungFluidCc', 'resp', 'sleep', 'steps', 'pain', 'symptoms', 'bmi', 'whtr'];
 
     let html = '';
     for (const k of keys) {
@@ -800,8 +802,10 @@ function normalizeHeader(h) {
   const s = String(h).trim().toLowerCase().replace(/\s+/g, '');
   const map = {
     'date': 'date', 'time': 'time', 'datetime': 'datetime',
+	'highbodybattery': 'highbodyBattery',
+	lowbodybattery': 'lowbodyBattery',
+	'stress': 'stress',
     'glucose(mg/dl)': 'glucose', 'glucose': 'glucose',
-    'bodybattery': 'bodyBattery', 'stress': 'stress',
     'weight(lbs)': 'weightLbs', 'weightlbs': 'weightLbs', 'weight': 'weightLbs',
     'height(in)': 'heightIn', 'heightin': 'heightIn', 'height': 'heightIn',
     'waist(in)': 'waistIn', 'waistin': 'waistIn', 'waist': 'waistIn',
@@ -826,7 +830,8 @@ function normalizeHeader(h) {
 function csvRowToEntry(row, headerIndex) {
   const e = {
     date: null, time: null,
-    glucose: null, bodyBattery: null, stress: null,
+    glucose: null, highbodyBattery: null, stress: null,
+	lowbodyBattery: null,
     weightLbs: null, heightIn: null, waistIn: null,
     tempF: null, lungFluidCc: null, sys: null, dia: null,
     spo2: null, hr: null, resp: null, sleep: null, steps: null,
@@ -859,7 +864,7 @@ function csvRowToEntry(row, headerIndex) {
   if (!e.time && timeIdx != null) e.time = U.normalizeTimeString(String(row[timeIdx] ?? '').trim()) || '00:00';
   if (!e.date) return null;
 
-  const numericKeys = ['bodyBattery', 'stress', 'weightLbs', 'heightIn', 'waistIn', 'tempF', 'lungFluidCc', 'sys', 'dia', 'spo2', 'hr', 'resp', 'sleep', 'steps', 'pain', 'symptoms', 'glucose'];
+  const numericKeys = ['highbodyBattery', 'lowbodyBattery', 'stress', 'weightLbs', 'heightIn', 'waistIn', 'tempF', 'lungFluidCc', 'sys', 'dia', 'spo2', 'hr', 'resp', 'sleep', 'steps', 'pain', 'symptoms', 'glucose'];
   for (const k of numericKeys) {
     const idx = headerIndex[k];
     if (idx != null) {
@@ -932,8 +937,9 @@ const Actions = {
     const en = {
       date: normDate,
       time: normTime,
+	  highbodyBattery: num('f_highbodyBattery'),
+	  lowbodyBattery: num('f_lowbodyBattery'),
       glucose: num('f_glucose'),
-      bodyBattery: num('f_bodyBattery'),
       stress: num('f_stress'),
       weightLbs: num('f_weightLbs'),
       heightIn: num('f_heightIn'),
@@ -980,7 +986,7 @@ const Actions = {
     try {
       const existing = State.thresholds || {};
       const merged = { ...existing };
-      const editKeys = ['glucose', 'sys', 'dia', 'spo2', 'hr', 'tempF', 'stress', 'bodyBattery', 'lungFluidCc', 'resp', 'sleep', 'steps', 'pain', 'symptoms', 'bmi', 'whtr'];
+      const editKeys = ['glucose', 'sys', 'dia', 'spo2', 'hr', 'tempF', 'stress', 'highbodyBattery', 'lowbodyBattery', 'lungFluidCc', 'resp', 'sleep', 'steps', 'pain', 'symptoms', 'bmi', 'whtr'];
 
       const getNum = (id) => {
         const el = document.getElementById(id);
@@ -1173,7 +1179,7 @@ const Actions = {
       const LABEL_ABBR = {
         'Glucose (mg/dL)': 'Glucose', 'Systolic (mmHg)': 'Sys', 'Diastolic (mmHg)': 'Dia',
         'Temperature (°F)': 'Temp', 'Heart Rate (bpm)': 'HR', 'Respiration (br/min)': 'Resp',
-        'Body Battery': 'BodyBat', 'SpO₂ (%)': 'SpO2', 'Lung Fluid (cc)': 'LungFl',
+        'High Body Battery': 'HighBodyBat', 'Low Body Battery': 'LowBodyBat','SpO₂ (%)': 'SpO2', 'Lung Fluid (cc)': 'LungFl',
         'Weight (lbs)': 'Wt', 'Height (in)': 'Ht', 'Waist (in)': 'Waist',
         'Sleep (hrs)': 'Sleep', 'Medicines': 'Meds', 'Emotions': 'Mood', 'Comments': 'Notes',
         'Symptoms (0-10)': 'Sx'
