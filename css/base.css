@@ -1,0 +1,70 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  margin: 10px;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+button {
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  background: var(--button-bg);
+  color: var(--fg);
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+canvas {
+  max-width: 100%;
+}
+
+.hidden {
+  display: none;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 5;
+}
+
+.modal {
+  position: fixed;
+  background: var(--panel);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  padding: 16px;
+  width: 90%;
+  max-width: 480px;
+  inset: 0;
+  margin: auto;
+  z-index: 10;
+}
+
+.modal label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
