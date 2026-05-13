@@ -1,35 +1,27 @@
-export function buildChart(ctx, rows, metrics, thresholds) {
-  if (!window.Chart) return null;
-
+export function buildChart(ctx, rows, metrics) {
   const labels = rows.map(r => r.date);
-
-  const datasets = metrics.map((key, i) => ({
-    label: key,
-    data: rows.map(r => r[key] ?? null),
-    borderColor: palette[i % palette.length],
-    spanGaps: true,
-    pointRadius: 0   // ✅ HUGE performance gain
-  }));
 
   return new Chart(ctx, {
     type: 'line',
-    data: { labels, datasets },
+    data: {
+      labels,
+      datasets: metrics.map((k, i) => ({
+        label: k,
+        data: rows.map(r => r[k]),
+        borderColor: ['#60a5fa', '#34d399', '#f87171'][i],
+        pointRadius: 0,
+        tension: 0.3
+      }))
+    },
     options: {
+      animation: false,
       parsing: false,
-      animation: false,         // ✅ speed
       normalized: true,
       plugins: {
         decimation: {
-          enabled: true,        // ✅ key optimization
+          enabled: true,
           algorithm: 'lttb',
           samples: 200
-        }
-      },
-      scales: {
-        x: {
-          ticks: {
-            callback: v => labels[v]
-          }
         }
       }
     }
