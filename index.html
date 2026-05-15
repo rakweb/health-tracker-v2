@@ -6,8 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0b1220" />
   <meta name="app-version" content="2.0.0">
-  <meta name="app-version" content="dev">
-
+  
 <!-- ===== Theme bootstrap (no flash, safe) ===== -->
 <script>
   (function () {
@@ -480,8 +479,6 @@ html[data-theme="light"] .toolbar .small{
     window.APP_BUILD = build;
   })();
 </script>
-
-  
   
 </head>
 <body>
@@ -605,23 +602,20 @@ html[data-theme="light"] .toolbar .small{
     <div class="modal">
       <div class="modal-header">
         <h2 id="entryModalTitle">Add Entry</h2>
-		<div class="modal-actions">
-        <button class="btn danger" id="btnDeleteEntry" style="display:none">Delete</button>
-        <button class="btn" id="btnSaveEntry">Save Entry</button>
-      </div>
+		<button class="btn" id="btnSaveEntry">Save Entry</button>
         <button class="btn" onclick="UI.closeEntry()">Close</button>
       </div>
       <div class="row">
         <div><label>Date</label><input type="date" id="f_date"></div>
         <div><label>Time</label><input type="time" id="f_time"></div>
-        <div><label>High Body Battery (0-100)</label><input type="number" id="f_bodyBattery" min="0" max="100"></div>
-		<div><label>Low Body Battery (0-100)</label><input type="number" id="f_bodyBattery" min="0" max="100"></div>
-        <div><label>Stress (0-100)</label><input type="number" id="f_stress" min="0" max="100"></div>
+        
+        <div><label>High Body Battery (0-100)</label><input type="number" id="f_highbodyBattery" min="0" max="100"></div>
+        <div><label>Low Body Battery (0-100)</label><input type="number" id="f_lowbodyBattery" min="0" max="100"></div>
+		<div><label>Stress (0-100)</label><input type="number" id="f_stress" min="0" max="100"></div>
         <div><label>Weight (lbs)</label><input type="number" id="f_weightLbs" inputmode="decimal"></div>
         <div><label>Height (in)</label><input type="number" id="f_heightIn" inputmode="decimal"></div>
         <div><label>Waist (in)</label><input type="number" id="f_waistIn" inputmode="decimal"></div>
         <div><label>Temperature (°F)</label><input type="number" id="f_tempF" inputmode="decimal"></div>
-		<div><label>Glucose (mg/dL)</label><input type="number" id="f_glucose" inputmode="decimal"></div>
         <div><label>Lung Fluid (cc)</label><input type="number" id="f_lungFluidCc" inputmode="decimal"></div>
         <div><label>Systolic (mmHg)</label><input type="number" id="f_sys" inputmode="numeric"></div>
         <div><label>Diastolic (mmHg)</label><input type="number" id="f_dia" inputmode="numeric"></div>
@@ -630,6 +624,7 @@ html[data-theme="light"] .toolbar .small{
         <div><label>Respiration (br/min)</label><input type="number" id="f_resp" inputmode="numeric"></div>
         <div><label>Sleep (hrs)</label><input type="number" id="f_sleep" step="0.1"></div>
         <div><label>Steps</label><input type="number" id="f_steps"></div>
+		<div><label>Glucose (mg/dL)</label><input type="number" id="f_glucose" inputmode="decimal"></div> 
         <div>
           <label>Pain (0-10)</label>
           <input type="range" class="score-range" id="f_pain" min="0" max="10" value="0" oninput="document.getElementById('painVal').textContent=this.value">
@@ -663,7 +658,9 @@ html[data-theme="light"] .toolbar .small{
           <textarea id="f_comments" placeholder="Notes..."></textarea>
         </div>
       </div>
-      
+      <div class="modal-actions">
+        <button class="btn danger" id="btnDeleteEntry" style="display:none">Delete</button>
+              </div>
     </div>
   </div>
 
@@ -675,13 +672,13 @@ html[data-theme="light"] .toolbar .small{
         <div style="display:flex; gap:8px; align-items:center;">
           <button class="btn ok" id="btnQuickAdd" title="Add a new entry">Add Entry</button>
           <button class="btn danger" id="btnBulkDelete" title="Bulk remove entries">Remove Entries…</button>
+		   <div class="modal-actions">
+        <button class="btn" id="btnSaveFields">Save Fields</button>
+      </div>
           <button class="btn" onclick="UI.closeFields()">Close</button>
         </div>
       </div>
       <div class="field-grid" id="fieldsGrid"></div>
-      <div class="modal-actions">
-        <button class="btn" id="btnSaveFields">Save Fields</button>
-      </div>
     </div>
   </div>
 
@@ -729,16 +726,26 @@ html[data-theme="light"] .toolbar .small{
     <div class="modal">
       <div class="modal-header">
         <h2>Per‑Metric Thresholds &amp; Bands</h2>
+		<div class="modal-actions">
+        <button class="btn ok" id="btnSaveThresholds" type="button">Save Thresholds</button>
+      </div>
         <button class="btn" onclick="UI.closeThresholds()">Close</button>
       </div>
       <div id="thEditor"></div>
-      <div class="modal-actions">
-        <button class="btn ok" id="btnSaveThresholds" type="button">Save Thresholds</button>
       </div>
-    </div>
   </div>
 
   <!-- Options Modal -->
+  
+ /* 
+  <div>
+  <label>Theme</label>
+  <select id="optTheme">
+    <option value="dark">Dark</option>
+    <option value="light">Light</option>
+  </select>
+</div>
+ */ 
   
   <div class="modal-backdrop" id="optModal">
     <div class="modal">
@@ -779,7 +786,7 @@ html[data-theme="light"] .toolbar .small{
   <script src="./range-slider.js"></script>
 
  
-<script type="module" src="js/app.js"></script>
+<script src="./app.js" defer></script>
  
  <script>
 (function () {
