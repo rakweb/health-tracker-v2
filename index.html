@@ -47,49 +47,43 @@
         </div>
     </header>
 
-    <main class="wrap">
+      <main class="wrap">
         <!-- Toolbar -->
         <div class="toolbar card">
-            <div class="row">
-                <div><label>From Date</label><input type="date" id="filterStart"></div>
-                <div><label>To Date</label><input type="date" id="filterEnd"></div>
-                <div>
-                    <label>Chart Metrics</label>
-                    <select id="chartMetrics" multiple size="4"></select>
-                </div>
-                <div>
-                    <label>View</label>
-                    <select id="viewMode">
-                        <option value="both" selected>Both</option>
-                        <option value="table">Table only</option>
-                        <option value="chart">Chart only</option>
-                    </select>
-                </div>
-            </div>
             <div class="row">
                 <button class="btn" id="btnRefresh">Refresh</button>
                 <button class="btn" id="btnFields">Select Fields</button>
                 <button class="btn" id="btnThresholds">Thresholds</button>
                 <button class="btn" id="btnSaveCSV">Save CSV</button>
                 <button class="btn" id="btnSavePDF">Save PDF</button>
-                <button class="btn" id="btnImportCSV">Import CSV</button>
                 <button class="btn ok" id="btnAdd">Add Entry</button>
                 <button class="btn warn" id="btnOptions">Options</button>
             </div>
         </div>
 
-        <!-- KPIs, Cards, etc. (shortened for brevity - add your full content here if needed) -->
-        <div class="kpis">...</div>
-        <div class="card full-width" id="entriesCard">...</div>
+        <!-- Chart -->
         <div class="card full-width" id="chartCard">
-            <canvas id="metricsChart" style="height:320px"></canvas>
+            <canvas id="metricsChart" style="height: 320px; width: 100%;"></canvas>
         </div>
+    </main>
+
+    <!-- Minimal Working Modal -->
+    <div class="modal-backdrop" id="entryModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:100;">
+        <div class="modal" style="background:#121a2a; padding:20px; border-radius:12px; width:90%; max-width:600px;">
+            <h2>Add Entry</h2>
+            <input type="date" id="f_date" style="width:100%; padding:10px; margin:10px 0;">
+            <input type="number" id="f_glucose" placeholder="Glucose (mg/dL)" style="width:100%; padding:10px; margin:10px 0;">
+            <button class="btn" id="btnSaveEntry">Save Entry</button>
+            <button class="btn" onclick="UI.closeEntry()">Close</button>
+        </div>
+    </div>
     </main>
 
     <!-- Modals (you can keep your full modal HTML here) -->
 
     <!-- Scripts -->
-    <script src="./range-slider.js"></script>
+	<script>
+      <script src="./range-slider.js"></script>
 
     <script src="./js/config.js" defer></script>
     <script src="./js/db.js" defer></script>
@@ -99,41 +93,33 @@
     <script src="./js/action.js" defer></script>
     <script src="./js/app.js" defer></script>
 
-    <!-- DIRECT BUTTON FIX -->
-    <script>
-        function bindButtons() {
-            console.log("🔧 Binding buttons directly...");
-
-            const buttons = {
-                'btnAdd': () => { console.log("Add Entry clicked"); document.getElementById('entryModal').classList.add('show'); },
-                'btnSaveEntry': () => { console.log("Save Entry clicked"); Action?.addEntry(); },
-                'btnSaveCSV': () => { console.log("Save CSV clicked"); Action?.exportCSV(); },
-                'btnSavePDF': () => { console.log("Save PDF clicked"); Action?.exportPDF(); },
-                'btnRefresh': () => { console.log("Refresh clicked"); UI?.refreshTable(); },
-                'btnFields': () => { console.log("Fields clicked"); },
-                'btnThresholds': () => { console.log("Thresholds clicked"); },
-                'btnOptions': () => { console.log("Options clicked"); }
-            };
-
-            Object.keys(buttons).forEach(id => {
-                const btn = document.getElementById(id);
-                if (btn) {
-                    // Remove old listeners first
-                    btn.replaceWith(btn.cloneNode(true));
-                    const freshBtn = document.getElementById(id);
-                    freshBtn.addEventListener('click', buttons[id]);
-                    console.log(`✅ Button ACTIVE: #${id}`);
-                } else {
-                    console.warn(`❌ Button MISSING: #${id}`);
-                }
-            });
-        }
-
-        // Run after everything loads
-        window.addEventListener('load', () => {
+            window.addEventListener('load', () => {
             console.log('🚀 Health Tracker Fully Loaded');
-            setTimeout(bindButtons, 800);   // Give time for all modules
+
+            // Direct button binding
+            setTimeout(() => {
+                document.getElementById('btnAdd')?.addEventListener('click', () => {
+                    console.log("Add Entry clicked");
+                    document.getElementById('entryModal').style.display = 'flex';
+                });
+
+                document.getElementById('btnSaveEntry')?.addEventListener('click', () => {
+                    Action.addEntry();
+                });
+
+                document.getElementById('btnSaveCSV')?.addEventListener('click', () => Action.exportCSV());
+                document.getElementById('btnSavePDF')?.addEventListener('click', () => Action.exportPDF());
+                document.getElementById('btnRefresh')?.addEventListener('click', () => UI.refreshTable());
+            }, 500);
         });
+
+        // Global close function for modal
+        window.UI = {
+            closeEntry() {
+                document.getElementById('entryModal').style.display = 'none';
+            }
+        };
     </script>
+      
 </body>
 </html>
