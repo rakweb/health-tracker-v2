@@ -1,104 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <title>Health Tracker</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#0b1220" />
-    <meta name="app-version" content="2.0.0">
+// js/chart.js
+let metricsChart = null;
 
-    <script>
-        (function () {
-            const saved = localStorage.getItem('HT_THEME');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            document.documentElement.setAttribute('data-theme', saved || (prefersDark ? 'dark' : 'light'));
-        })();
-    </script>
+const ChartManager = {
+    init() {
+        const canvas = document.getElementById('metricsChart');
+        if (!canvas) {
+            console.warn("❌ Canvas #metricsChart not found");
+            return;
+        }
 
-    <link rel="stylesheet" href="./css/base.css" />
-    <link rel="stylesheet" href="./css/styles.css" />
-    <link rel="stylesheet" href="./css/theme-dark.css" />
-    <link rel="stylesheet" href="./css/theme-light.css" />
-    <link rel="stylesheet" href="./range-slider.css" />
+        // Prevent infinite resize loop
+        const container = canvas.parentElement;
+        if (container) {
+            container.style.height = "380px";
+            container.style.position = "relative";
+        }
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
-</head>
-<body>
-
-    <header>
-        <div class="wrap headbar">
-            <h1>Health Tracker</h1>
-            <div>
-                <button id="btnAdd" class="btn ok">Add Entry</button>
-                <button id="btnSaveCSV" class="btn">Save CSV</button>
-                <button id="btnSavePDF" class="btn">Save PDF</button>
-                <button id="btnRefresh" class="btn">Refresh</button>
-                <button id="btnTheme" class="btn">🌙</button>
-            </div>
-        </div>
-    </header>
-
-    <main class="wrap">
-        <div class="card">
-            <h2>Metrics Chart</h2>
-            <div style="height: 380px;">
-                <canvas id="metricsChart"></canvas>
-            </div>
-        </div>
-    </main>
-
-    <!-- Simple Modal -->
-    <div id="entryModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9999; align-items:center; justify-content:center;">
-        <div style="background:#121a2a; padding:25px; border-radius:12px; width:90%; max-width:500px;">
-            <h2>Add Entry</h2>
-            <input type="date" id="f_date" style="width:100%; padding:12px; margin:10px 0;">
-            <input type="number" id="f_glucose" placeholder="Glucose" style="width:100%; padding:12px; margin:10px 0;">
-            <br><br>
-            <button id="btnSaveEntry" class="btn ok">Save</button>
-            <button onclick="document.getElementById('entryModal').style.display='none'" class="btn">Cancel</button>
-        </div>
-    </div>
-
-    <!-- All JS Files -->
-    <script src="./range-slider.js"></script>
-    <script src="./js/config.js" defer></script>
-    <script src="./js/db.js" defer></script>
-    <script src="./js/validator.js" defer></script>
-    <script src="./js/chart.js" defer></script>
-    <script src="./js/worker.js" defer></script>
-    <script src="./js/action.js" defer></script>
-    <script src="./js/app.js" defer></script>
-
-   <script>
-        window.addEventListener('load', () => {
-            console.log("🚀 Final Button Binding Active");
-
-            // Strong button binding
-            const bindBtn = (id, handler) => {
-                const btn = document.getElementById(id);
-                if (btn) {
-                    btn.addEventListener('click', handler);
-                    console.log(`✅ Button ready: ${id}`);
+        metricsChart = new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels: ["No Data"],
+                datasets: [{
+                    label: "No entries yet",
+                    data: [0],
+                    borderColor: "#4ba3ff",
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' },
+                    title: {
+                        display: true,
+                        text: 'No data yet — Add some entries'
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true }
                 }
-            };
-
-            bindBtn('btnAdd', () => {
-                document.getElementById('entryModal').style.display = 'flex';
-            });
-
-            bindBtn('btnSaveEntry', () => Action?.addEntry?.());
-            bindBtn('btnSaveCSV', () => Action?.exportCSV?.());
-            bindBtn('btnSavePDF', () => Action?.exportPDF?.());
-            bindBtn('btnRefresh', () => UI?.refreshTable?.());
-            bindBtn('btnFields', () => console.log("Fields clicked"));
-            bindBtn('btnThresholds', () => console.log("Thresholds clicked"));
-            bindBtn('btnOptions', () => console.log("Options clicked"));
-
-            // Initialize Chart
-            if (typeof ChartManager !== "undefined") {
-                setTimeout(() => ChartManager.init(), 400);
             }
         });
-    </script>
-</body>
-</html>
+
+        console.log("✅ Chart initialized (stable)");
+    },
+
+    update(labels = [], datasets = []) {
+        if (!metricsChart) return;
+        metricsChart.data.labels = labels.length ? labels : ["No Data"];
+        metricsChart.data.datasets = datasets.length ? datasets : [{
+            label: "Sample", data: [0], borderColor: "#4ba3ff"
+        }];
+        metricsChart.update();
+    }
+};
+
+window.ChartManager = ChartManager;
