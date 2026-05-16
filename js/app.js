@@ -1,84 +1,55 @@
 // js/app.js
-console.log("🚀 Health Tracker v" + CONFIG.VERSION + " initialized");
+console.log("🚀 app.js loaded");
 
 const UI = {
     init() {
-        console.log("✅ UI.init() started - Binding all buttons");
+        console.log("✅ UI initialized - Binding buttons");
 
-        // Bind all major buttons
-        this.bindAllButtons();
-
-        // Initialize chart safely after DOM is ready
-        setTimeout(() => {
-            if (typeof ChartManager !== "undefined") {
-                ChartManager.init();
-            }
-        }, 300);
-
-        // Load initial data
+        this.bindButtons();
         this.refreshTable();
     },
 
-    bindAllButtons() {
-        const buttons = [
-            { id: 'btnAdd', action: () => this.showEntryModal() },
-            { id: 'btnSaveEntry', action: () => Action.addEntry() },
-            { id: 'btnSaveCSV', action: () => Action.exportCSV() },
-            { id: 'btnSavePDF', action: () => Action.exportPDF() },
-            { id: 'btnRefresh', action: () => this.refreshTable() },
-            { id: 'btnFields', action: () => this.showFieldsModal() },
-            { id: 'btnThresholds', action: () => this.showThresholdsModal() },
-            { id: 'btnOptions', action: () => this.showOptionsModal() },
-            { id: 'btnTheme', action: null } // already handled in index.html
-        ];
-
-        buttons.forEach(btn => {
-            const element = document.getElementById(btn.id);
-            if (element) {
-                if (btn.action) {
-                    element.addEventListener('click', btn.action);
-                    console.log(`✅ Button bound: #${btn.id}`);
-                }
-            } else {
-                console.warn(`⚠️ Button not found: #${btn.id}`);
-            }
-        });
+    bindButtons() {
+        document.getElementById('btnAdd')?.addEventListener('click', () => this.showEntryModal());
+        document.getElementById('btnSaveEntry')?.addEventListener('click', () => Action.addEntry());
+        document.getElementById('btnSaveCSV')?.addEventListener('click', () => Action.exportCSV());
+        document.getElementById('btnSavePDF')?.addEventListener('click', () => Action.exportPDF());
+        document.getElementById('btnRefresh')?.addEventListener('click', () => this.refreshTable());
     },
 
     showEntryModal() {
-        document.getElementById('entryModal')?.classList.add('show');
+        const modal = document.getElementById('entryModal');
+        if (modal) modal.style.display = 'flex';
     },
 
     closeEntry() {
-        document.getElementById('entryModal')?.classList.remove('show');
-    },
-
-    showFieldsModal() {
-        document.getElementById('fieldsModal')?.classList.add('show');
-    },
-
-    showThresholdsModal() {
-        document.getElementById('thModal')?.classList.add('show');
-    },
-
-    showOptionsModal() {
-        document.getElementById('optModal')?.classList.add('show');
+        const modal = document.getElementById('entryModal');
+        if (modal) modal.style.display = 'none';
     },
 
     async refreshTable() {
         try {
             const entries = await DB.getAllEntries();
-            console.log(`📊 Loaded ${entries.length} entries`);
-            // TODO: Render table here later
-        } catch (e) {
-            console.error("Failed to refresh table", e);
+            console.log(`📋 Refreshing table with ${entries.length} entries`);
+
+            const tbody = document.getElementById('tableBody');
+            if (tbody) {
+                tbody.innerHTML = '';
+                entries.forEach(entry => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${entry.date || ''}</td>
+                        <td>${entry.glucose || '-'}</td>
+                        <td>${new Date(entry.timestamp).toLocaleTimeString()}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+        } catch (err) {
+            console.error("Failed to refresh table", err);
         }
     }
 };
 
-// Start the app when everything is ready
-window.addEventListener('load', () => {
-    UI.init();
-});
-
 window.UI = UI;
+window.addEventListener('load', () => UI.init());
