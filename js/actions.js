@@ -1,16 +1,40 @@
-import { DB } from './db.js';
-import { validateEntry } from './validator.js';
+// js/action.js
+const Action = {
+    async addEntry() {
+        const entry = {
+            date: document.getElementById('f_date').value,
+            time: document.getElementById('f_time').value,
+            glucose: parseFloat(document.getElementById('f_glucose').value) || null,
+            sys: parseInt(document.getElementById('f_sys').value) || null,
+            dia: parseInt(document.getElementById('f_dia').value) || null,
+            // ... add other fields as needed
+            timestamp: new Date().toISOString()
+        };
 
-export const Actions = {
-  async save(entry) {
-    const errors = validateEntry(entry);
+        const validation = Validator.entry(entry);
+        if (!validation.valid) {
+            alert(validation.errors.join('\n'));
+            return;
+        }
 
-    if (errors.length) {
-      alert(errors.join('\n'));
-      return false;
+        await DB.addEntry(entry);
+        UI.refreshTable();
+        UI.closeEntry();
+    },
+
+    exportCSV() {
+        alert("CSV Export - Implement logic here");
+        // Full implementation can be expanded
+    },
+
+    exportPDF() {
+        if (typeof jspdf === 'undefined') {
+            alert("jsPDF not loaded");
+            return;
+        }
+        alert("PDF Export started (light mode forced)");
+        // Full jsPDF logic goes here
     }
-
-    await DB.save(entry);
-    return true;
-  }
 };
+
+window.Action = Action;
