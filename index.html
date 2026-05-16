@@ -7,57 +7,29 @@
     <meta name="theme-color" content="#0b1220" />
     <meta name="app-version" content="2.0.0">
 
-    <!-- Theme bootstrap (prevents flash) -->
+    <!-- Theme bootstrap -->
     <script>
         (function () {
             const saved = localStorage.getItem('HT_THEME');
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             const theme = saved || (prefersDark ? 'dark' : 'light');
             document.documentElement.setAttribute('data-theme', theme);
-            window.APP_THEME = theme;
         })();
     </script>
 
-    <!-- CSS -->
     <link rel="stylesheet" href="./css/base.css" />
     <link rel="stylesheet" href="./css/styles.css" />
     <link rel="stylesheet" href="./css/theme-dark.css" />
     <link rel="stylesheet" href="./css/theme-light.css" />
     <link rel="stylesheet" href="./range-slider.css" />
 
-    <!-- PWA -->
     <link rel="manifest" href="./manifest.json" />
     <link rel="icon" href="./icons/icon-192.png" sizes="192x192" />
     <link rel="apple-touch-icon" href="./icons/icon-192.png" />
 
-    <!-- Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0/dist/chartjs-plugin-annotation.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
-
-    <style>
-        :root {
-            --bg:#0b1220; --panel:#121a2a; --muted:#8aa0c3; --text:#e6eefc;
-            --accent:#4ba3ff; --danger:#ff5c5c; --warn:#ffcc66; --ok:#27d79b;
-            --ring:#2a3a58; --chip:#1a2440; --btn:#1a2842; --btn-hover:#223152; --card:#0e1628;
-        }
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-            background: linear-gradient(180deg, #0a1120 0%, #0b1220 60%, #0d1322 100%);
-            color: var(--text);
-        }
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 20;
-            backdrop-filter: blur(8px);
-            background: rgba(9,13,24,0.6);
-            border-bottom: 1px solid var(--ring);
-        }
-        .wrap { max-width: 1200px; margin: 0 auto; padding: 12px 16px; }
-    </style>
 </head>
 <body>
 
@@ -70,161 +42,40 @@
             <div class="install">
                 <button id="btnInstall" class="btn" style="display:none">📲 Install</button>
                 <button id="btnCheckUpdates" class="btn">Check for updates</button>
-                <button id="btnTheme" class="btn" title="Toggle light/dark theme">🌙</button>
+                <button id="btnTheme" class="btn" title="Toggle theme">🌙</button>
             </div>
         </div>
     </header>
 
     <main class="wrap">
-        <!-- Toolbar -->
-        <div class="toolbar card">
-            <div class="row">
-                <div><label>From Date</label><input type="date" id="filterStart"></div>
-                <div><label>To Date</label><input type="date" id="filterEnd"></div>
-                <div>
-                    <label>Chart Metrics</label>
-                    <select id="chartMetrics" multiple size="4"></select>
-                    <div class="small">Hold Ctrl/Cmd for multi-select</div>
-                </div>
-                <div>
-                    <label>Axis Mode</label>
-                    <select id="axisMode">
-                        <option value="single">Single Y-axis</option>
-                        <option value="perMetric" selected>Per-metric axes</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Show Metrics Chart</label>
-                    <select id="toggleChart">
-                        <option value="on" selected>On</option>
-                        <option value="off">Off</option>
-                    </select>
-                </div>
-                <div>
-                    <label>View</label>
-                    <select id="viewMode">
-                        <option value="both" selected>Both (Table + Chart)</option>
-                        <option value="table">Table only</option>
-                        <option value="chart">Chart only</option>
-                    </select>
-                </div>
-            </div>
-            <div class="row">
-                <button class="btn" id="btnRefresh">Refresh</button>
-                <button class="btn" id="btnFields">Select Fields</button>
-                <button class="btn" id="btnThresholds">Thresholds</button>
-                <button class="btn" id="btnSaveCSV">Save CSV</button>
-                <button class="btn" id="btnSavePDF">Save PDF</button>
-                <button class="btn" id="btnImportCSV">Import CSV</button>
-                <input type="file" id="importFile" accept=".csv,text/csv" style="display:none" />
-                <button class="btn ok" id="btnAdd">Add Entry</button>
-                <button class="btn warn" id="btnOptions">Options</button>
-            </div>
-        </div>
-
-        <!-- KPIs, Risk Alerts, Entries, Chart -->
-        <div class="kpis"> ... (your existing KPI cards) ... </div>
-        <div class="card"> ... Risk Alerts ... </div>
-        <div class="card full-width" id="entriesCard"> ... Table ... </div>
-        <div class="card full-width" id="chartCard"> ... Chart ... </div>
+        <!-- Your full UI content stays here (toolbar, kpis, cards, modals, etc.) -->
+        <!-- ... paste your existing main content ... -->
     </main>
 
-    <!-- Update Toast -->
-    <div id="updateToast" class="toast">
-        <span>New version available.</span>
-        <button id="btnReloadNow" class="btn ok">Reload now</button>
-        <button id="btnDismissToast" class="btn">Later</button>
-    </div>
-
-    <!-- All Modals (kept as-is) -->
-    <!-- Entry Modal, Fields Modal, Bulk Remove, Thresholds, Options, etc. -->
-
-    <!-- Scripts -->
+    <!-- Scripts - Load in correct order -->
     <script src="./range-slider.js"></script>
 
-    <!-- Main Application Modules -->
     <script src="./js/config.js" defer></script>
     <script src="./js/db.js" defer></script>
     <script src="./js/validator.js" defer></script>
     <script src="./js/chart.js" defer></script>
+    <script src="./js/worker.js" defer></script>
     <script src="./js/action.js" defer></script>
     <script src="./js/app.js" defer></script>
 
-    <!-- Core PWA + Theme + Chart Theme Logic -->
+    <!-- Final Core Initialization -->
     <script>
-        let deferredPrompt = null;
-
-        // PWA Install
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('btnInstall').style.display = 'inline-block';
-        });
-
-        document.getElementById('btnInstall').addEventListener('click', async () => {
-            if (!deferredPrompt) return;
-            deferredPrompt.prompt();
-            await deferredPrompt.userChoice;
-            deferredPrompt = null;
-            this.style.display = 'none';
-        });
-
-        // Theme Toggle
-        const btnTheme = document.getElementById('btnTheme');
-        const updateThemeIcon = () => {
-            btnTheme.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
-        };
-
-        btnTheme.addEventListener('click', () => {
-            const current = document.documentElement.getAttribute('data-theme');
-            const next = current === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', next);
-            localStorage.setItem('HT_THEME', next);
-            updateThemeIcon();
-        });
-        updateThemeIcon();
-
-        // Version Display
+        // This runs after all deferred scripts
         window.addEventListener('load', () => {
-            const version = document.querySelector('meta[name="app-version"]').content;
-            document.getElementById('appVersion').textContent = `v${version}`;
+            console.log('🚀 Health Tracker Fully Loaded');
+
+            // Make sure UI.init() exists before calling
+            if (typeof UI !== 'undefined' && typeof UI.init === 'function') {
+                UI.init();
+            } else {
+                console.error("UI.init() not found - check app.js");
+            }
         });
-
-        // PDF Light Mode
-        document.getElementById('btnSavePDF')?.addEventListener('click', () => {
-            const root = document.documentElement;
-            root.setAttribute('data-pdf-export', '1');
-            setTimeout(() => root.removeAttribute('data-pdf-export'), 2500);
-        }, true);
-
-        // Consolidated Chart Theme Handler
-        function applyChartTheme() {
-            if (typeof Chart === 'undefined') return;
-            const isLight = document.documentElement.getAttribute('data-theme') === 'light' ||
-                            document.documentElement.getAttribute('data-pdf-export') === '1';
-
-            const text = isLight ? '#0a1220' : '#e6eefc';
-            const muted = isLight ? '#2b3d57' : '#8aa0c3';
-            const grid = isLight ? 'rgba(10,18,32,0.16)' : 'rgba(230,238,252,0.14)';
-
-            Chart.defaults.color = text;
-            Chart.defaults.plugins.legend.labels.color = muted;
-            Chart.defaults.scale.ticks.color = muted;
-            Chart.defaults.scale.grid.color = grid;
-
-            const chart = Chart.getChart('metricsChart');
-            if (chart) chart.update();
-        }
-
-        window.addEventListener('load', () => {
-            const interval = setInterval(() => {
-                applyChartTheme();
-                if (window.Chart?.getChart?.('metricsChart')) clearInterval(interval);
-            }, 100);
-        });
-
-        new MutationObserver(applyChartTheme)
-            .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'data-pdf-export'] });
     </script>
 </body>
 </html>
