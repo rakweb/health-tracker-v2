@@ -48,11 +48,47 @@
     </header>
 
     <main class="wrap">
-        <!-- Your full UI content stays here (toolbar, kpis, cards, modals, etc.) -->
-        <!-- ... paste your existing main content ... -->
+        <!-- Toolbar -->
+        <div class="toolbar card">
+            <div class="row">
+                <div><label>From Date</label><input type="date" id="filterStart"></div>
+                <div><label>To Date</label><input type="date" id="filterEnd"></div>
+                <div>
+                    <label>Chart Metrics</label>
+                    <select id="chartMetrics" multiple size="4"></select>
+                </div>
+                <div>
+                    <label>View</label>
+                    <select id="viewMode">
+                        <option value="both" selected>Both</option>
+                        <option value="table">Table only</option>
+                        <option value="chart">Chart only</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <button class="btn" id="btnRefresh">Refresh</button>
+                <button class="btn" id="btnFields">Select Fields</button>
+                <button class="btn" id="btnThresholds">Thresholds</button>
+                <button class="btn" id="btnSaveCSV">Save CSV</button>
+                <button class="btn" id="btnSavePDF">Save PDF</button>
+                <button class="btn" id="btnImportCSV">Import CSV</button>
+                <button class="btn ok" id="btnAdd">Add Entry</button>
+                <button class="btn warn" id="btnOptions">Options</button>
+            </div>
+        </div>
+
+        <!-- KPIs, Cards, etc. (shortened for brevity - add your full content here if needed) -->
+        <div class="kpis">...</div>
+        <div class="card full-width" id="entriesCard">...</div>
+        <div class="card full-width" id="chartCard">
+            <canvas id="metricsChart" style="height:320px"></canvas>
+        </div>
     </main>
 
-    <!-- Scripts - Load in correct order -->
+    <!-- Modals (you can keep your full modal HTML here) -->
+
+    <!-- Scripts -->
     <script src="./range-slider.js"></script>
 
     <script src="./js/config.js" defer></script>
@@ -63,18 +99,10 @@
     <script src="./js/action.js" defer></script>
     <script src="./js/app.js" defer></script>
 
-    <!-- Final Core Initialization -->
     <script>
-        // This runs after all deferred scripts
         window.addEventListener('load', () => {
             console.log('🚀 Health Tracker Fully Loaded');
-
-            // Make sure UI.init() exists before calling
-            if (typeof UI !== 'undefined' && typeof UI.init === 'function') {
-                UI.init();
-            } else {
-                console.error("UI.init() not found - check app.js");
-            }
+            if (typeof UI !== "undefined") UI.init();
         });
     </script>
 </body>
