@@ -38,27 +38,40 @@
         </div>
     </header>
 
-    <main class="wrap">
-        <div class="card">
+      <main class="wrap">
+        <!-- Toolbar -->
+        <div class="toolbar card">
+            <div class="row">
+                <button class="btn" id="btnRefresh">Refresh</button>
+                <button class="btn" id="btnFields">Select Fields</button>
+                <button class="btn" id="btnThresholds">Thresholds</button>
+                <button class="btn" id="btnSaveCSV">Save CSV</button>
+                <button class="btn" id="btnSavePDF">Save PDF</button>
+                <button class="btn ok" id="btnAdd">Add Entry</button>
+            </div>
+        </div>
+
+        <!-- Entries Table FIRST -->
+        <div class="card full-width" id="entriesCard">
+            <h2>Entries</h2>
+            <table style="width:100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Glucose</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Chart BELOW Table -->
+        <div class="card full-width" id="chartCard">
             <h2>Metrics Chart</h2>
-            <div style="height: 380px;">
+            <div style="height: 380px; position: relative;">
                 <canvas id="metricsChart"></canvas>
             </div>
-			
-			    <div class="card full-width" id="entriesCard">
-        <h2>Recent Entries</h2>
-        <table style="width:100%; border-collapse: collapse;">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Glucose</th>
-                    <th>Time</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
-    </div>
-	
         </div>
     </main>
 
