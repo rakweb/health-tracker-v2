@@ -120,6 +120,23 @@
             <button onclick="document.getElementById('entryModal').style.display='none'" class="btn">Cancel</button>
         </div>
     </div>
+	
+	    <script>
+        window.addEventListener('load', () => {
+            console.log("%c🛠️ DB Debug Tools Available", "color:orange");
+
+            // Global debug helpers
+            window.debugDB = {
+                showAll: async () => {
+                    const entries = await DB.getAllEntries();
+                    console.table(entries);
+                },
+                clearAll: () => DB.clearAllData()
+            };
+
+            console.log("Type debugDB.showAll() or debugDB.clearAll() in console");
+        });
+    </script>
 </body>
 </html>
 </body>
