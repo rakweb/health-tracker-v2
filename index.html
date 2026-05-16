@@ -69,34 +69,34 @@
     <script src="./js/action.js" defer></script>
     <script src="./js/app.js" defer></script>
 
-    <script>
+   <script>
         window.addEventListener('load', () => {
-            console.log("🚀 Health Tracker - Final Binding");
+            console.log("🚀 Final Button Binding Active");
 
-            // Button Bindings
-            document.getElementById('btnAdd').addEventListener('click', () => {
+            // Strong button binding
+            const bindBtn = (id, handler) => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.addEventListener('click', handler);
+                    console.log(`✅ Button ready: ${id}`);
+                }
+            };
+
+            bindBtn('btnAdd', () => {
                 document.getElementById('entryModal').style.display = 'flex';
             });
 
-            document.getElementById('btnSaveEntry').addEventListener('click', () => {
-                if (typeof Action !== 'undefined') Action.addEntry();
-            });
+            bindBtn('btnSaveEntry', () => Action?.addEntry?.());
+            bindBtn('btnSaveCSV', () => Action?.exportCSV?.());
+            bindBtn('btnSavePDF', () => Action?.exportPDF?.());
+            bindBtn('btnRefresh', () => UI?.refreshTable?.());
+            bindBtn('btnFields', () => console.log("Fields clicked"));
+            bindBtn('btnThresholds', () => console.log("Thresholds clicked"));
+            bindBtn('btnOptions', () => console.log("Options clicked"));
 
-            document.getElementById('btnSaveCSV').addEventListener('click', () => {
-                if (typeof Action !== 'undefined') Action.exportCSV();
-            });
-
-            document.getElementById('btnSavePDF').addEventListener('click', () => {
-                if (typeof Action !== 'undefined') Action.exportPDF();
-            });
-
-            document.getElementById('btnRefresh').addEventListener('click', () => {
-                if (typeof UI !== 'undefined') UI.refreshTable();
-            });
-
-            // Init Chart
-            if (typeof ChartManager !== 'undefined') {
-                setTimeout(() => ChartManager.init(), 500);
+            // Initialize Chart
+            if (typeof ChartManager !== "undefined") {
+                setTimeout(() => ChartManager.init(), 400);
             }
         });
     </script>
