@@ -3,7 +3,7 @@ console.log("✅ action.js loaded");
 
 const Action = {
     async addEntry() {
-        console.log("💾 Saving entry...");
+        console.log("💾 Attempting to save entry...");
 
         const entry = {
             date: document.getElementById('f_date')?.value,
@@ -18,35 +18,28 @@ const Action = {
 
         try {
             await DB.addEntry(entry);
-            console.log("✅ Entry saved successfully");
+            console.log("✅ Entry saved to DB");
 
             alert("✅ Entry saved successfully!");
-            
-            // Close modal
+
+            // Close modal immediately
             UI.closeEntry();
-            
+
             // Refresh table
             await UI.refreshTable();
 
         } catch (err) {
-            console.error("❌ Save failed:", err);
-            alert("❌ Failed to save entry");
+            console.error("Save error:", err);
+            alert("❌ Failed to save");
         }
     },
 
     exportCSV() {
-        DB.getAllEntries().then(entries => {
-            if (entries.length === 0) {
-                alert("No entries to export");
-                return;
-            }
-            WorkerManager.exportCSV(entries);
-        });
+        DB.getAllEntries().then(entries => WorkerManager.exportCSV(entries));
     },
 
     exportPDF() {
-        alert("📄 PDF Export started (Light mode enabled)");
-        // Full implementation later
+        alert("PDF Export started");
     }
 };
 
