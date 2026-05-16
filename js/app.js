@@ -3,8 +3,7 @@ console.log("🚀 app.js loaded");
 
 const UI = {
     init() {
-        console.log("✅ UI initialized - Binding buttons");
-
+        console.log("✅ UI initialized");
         this.bindButtons();
         this.refreshTable();
     },
@@ -18,8 +17,7 @@ const UI = {
     },
 
     showEntryModal() {
-        const modal = document.getElementById('entryModal');
-        if (modal) modal.style.display = 'flex';
+        document.getElementById('entryModal').style.display = 'flex';
     },
 
     closeEntry() {
@@ -28,26 +26,23 @@ const UI = {
     },
 
     async refreshTable() {
-        try {
-            const entries = await DB.getAllEntries();
-            console.log(`📋 Refreshing table with ${entries.length} entries`);
+        const entries = await DB.getAllEntries();
+        const tbody = document.getElementById('tableBody');
+        if (!tbody) return;
 
-            const tbody = document.getElementById('tableBody');
-            if (tbody) {
-                tbody.innerHTML = '';
-                entries.forEach(entry => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${entry.date || ''}</td>
-                        <td>${entry.glucose || '-'}</td>
-                        <td>${new Date(entry.timestamp).toLocaleTimeString()}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            }
-        } catch (err) {
-            console.error("Failed to refresh table", err);
-        }
+        tbody.innerHTML = '';
+
+        entries.forEach(entry => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${entry.date || '—'}</td>
+                <td>${entry.glucose !== null ? entry.glucose : '—'}</td>
+                <td>${new Date(entry.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        console.log(`📋 Table refreshed with ${entries.length} entries`);
     }
 };
 
