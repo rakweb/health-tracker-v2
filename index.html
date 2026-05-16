@@ -7,7 +7,6 @@
     <meta name="theme-color" content="#0b1220" />
     <meta name="app-version" content="2.0.0">
 
-    <!-- Theme -->
     <script>
         (function () {
             const saved = localStorage.getItem('HT_THEME');
@@ -22,63 +21,46 @@
     <link rel="stylesheet" href="./css/theme-light.css" />
     <link rel="stylesheet" href="./range-slider.css" />
 
-    <link rel="manifest" href="./manifest.json" />
-    <link rel="icon" href="./icons/icon-192.png" />
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
 </head>
 <body>
 
     <header>
         <div class="wrap headbar">
+            <h1>Health Tracker</h1>
             <div>
-                <h1>Health Tracker</h1>
-                <div class="small" id="appVersion"></div>
-            </div>
-            <div>
-                <button id="btnInstall" class="btn" style="display:none">Install</button>
+                <button id="btnAdd" class="btn ok">Add Entry</button>
+                <button id="btnSaveCSV" class="btn">Save CSV</button>
+                <button id="btnSavePDF" class="btn">Save PDF</button>
+                <button id="btnRefresh" class="btn">Refresh</button>
                 <button id="btnTheme" class="btn">🌙</button>
             </div>
         </div>
     </header>
 
     <main class="wrap">
-        <!-- Toolbar -->
-        <div class="toolbar card">
-            <div class="row">
-                <button class="btn" id="btnRefresh">Refresh</button>
-                <button class="btn" id="btnFields">Select Fields</button>
-                <button class="btn" id="btnThresholds">Thresholds</button>
-                <button class="btn" id="btnSaveCSV">Save CSV</button>
-                <button class="btn" id="btnSavePDF">Save PDF</button>
-                <button class="btn ok" id="btnAdd">Add Entry</button>
-                <button class="btn warn" id="btnOptions">Options</button>
-            </div>
-        </div>
-
-        <!-- Chart -->
-        <div class="card full-width" id="chartCard">
+        <div class="card">
             <h2>Metrics Chart</h2>
-            <canvas id="metricsChart" style="height: 360px; width: 100%;"></canvas>
+            <div style="height: 380px;">
+                <canvas id="metricsChart"></canvas>
+            </div>
         </div>
     </main>
 
-    <!-- Add Entry Modal -->
-    <div id="entryModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; align-items: center; justify-content: center;">
-        <div style="background: #121a2a; padding: 25px; border-radius: 12px; width: 90%; max-width: 520px; border: 1px solid #2a3a58;">
-            <h2>Add New Entry</h2>
+    <!-- Simple Modal -->
+    <div id="entryModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:#121a2a; padding:25px; border-radius:12px; width:90%; max-width:500px;">
+            <h2>Add Entry</h2>
             <input type="date" id="f_date" style="width:100%; padding:12px; margin:10px 0;">
-            <input type="number" id="f_glucose" placeholder="Glucose (mg/dL)" style="width:100%; padding:12px; margin:10px 0;">
-            <div style="margin-top: 20px;">
-                <button id="btnSaveEntry" class="btn ok" style="margin-right: 12px;">Save Entry</button>
-                <button onclick="closeModal()" class="btn">Cancel</button>
-            </div>
+            <input type="number" id="f_glucose" placeholder="Glucose" style="width:100%; padding:12px; margin:10px 0;">
+            <br><br>
+            <button id="btnSaveEntry" class="btn ok">Save</button>
+            <button onclick="document.getElementById('entryModal').style.display='none'" class="btn">Cancel</button>
         </div>
     </div>
 
-    <!-- Scripts - Correct Order -->
+    <!-- All JS Files -->
     <script src="./range-slider.js"></script>
-
     <script src="./js/config.js" defer></script>
     <script src="./js/db.js" defer></script>
     <script src="./js/validator.js" defer></script>
@@ -87,37 +69,36 @@
     <script src="./js/action.js" defer></script>
     <script src="./js/app.js" defer></script>
 
-    <!-- Final Direct Binding -->
     <script>
         window.addEventListener('load', () => {
-            console.log('%c🚀 Health Tracker Fully Ready', 'color: lime; font-weight: bold');
+            console.log("🚀 Health Tracker - Final Binding");
 
-            // Direct Button Binding
-            const bind = (id, fn) => {
-                const el = document.getElementById(id);
-                if (el) el.addEventListener('click', fn);
-                else console.warn(`Button not found: ${id}`);
-            };
-
-            bind('btnAdd', () => {
+            // Button Bindings
+            document.getElementById('btnAdd').addEventListener('click', () => {
                 document.getElementById('entryModal').style.display = 'flex';
             });
 
-            bind('btnSaveEntry', () => Action.addEntry());
-            bind('btnSaveCSV', () => Action.exportCSV());
-            bind('btnSavePDF', () => Action.exportPDF());
-            bind('btnRefresh', () => UI.refreshTable());
+            document.getElementById('btnSaveEntry').addEventListener('click', () => {
+                if (typeof Action !== 'undefined') Action.addEntry();
+            });
+
+            document.getElementById('btnSaveCSV').addEventListener('click', () => {
+                if (typeof Action !== 'undefined') Action.exportCSV();
+            });
+
+            document.getElementById('btnSavePDF').addEventListener('click', () => {
+                if (typeof Action !== 'undefined') Action.exportPDF();
+            });
+
+            document.getElementById('btnRefresh').addEventListener('click', () => {
+                if (typeof UI !== 'undefined') UI.refreshTable();
+            });
 
             // Init Chart
             if (typeof ChartManager !== 'undefined') {
-                setTimeout(() => ChartManager.init(), 300);
+                setTimeout(() => ChartManager.init(), 500);
             }
         });
-
-        function closeModal() {
-            document.getElementById('entryModal').style.display = 'none';
-        }
-        window.closeModal = closeModal;
     </script>
 </body>
 </html>
