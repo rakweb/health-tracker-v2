@@ -5,9 +5,14 @@ const ChartManager = {
     init() {
         const canvas = document.getElementById('metricsChart');
         if (!canvas) {
-            console.warn("Chart canvas not found");
+            console.warn("❌ metricsChart canvas not found");
             return;
         }
+
+        // Force proper sizing
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
+        canvas.parentElement.style.height = "380px";
 
         metricsChart = new Chart(canvas, {
             type: 'line',
@@ -20,24 +25,32 @@ const ChartManager = {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { position: 'top' },
-                    title: { display: false }
+                    title: {
+                        display: true,
+                        text: 'No data yet - Add some entries'
+                    }
                 },
                 scales: {
-                    y: { beginAtZero: false }
+                    x: { display: true },
+                    y: { 
+                        beginAtZero: false,
+                        display: true 
+                    }
                 }
             }
         });
 
-        console.log("✅ Chart initialized");
+        console.log("✅ Chart initialized successfully");
     },
 
-    update(labels, datasets) {
+    update(labels = [], datasets = []) {
         if (!metricsChart) return;
+        
         metricsChart.data.labels = labels;
         metricsChart.data.datasets = datasets;
+        metricsChart.options.plugins.title.text = datasets.length ? "Health Metrics" : "No data yet";
         metricsChart.update();
     }
 };
 
-console.log("✅ chart.js loaded");
 window.ChartManager = ChartManager;
