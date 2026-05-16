@@ -69,36 +69,75 @@
     <script src="./js/action.js" defer></script>
     <script src="./js/app.js" defer></script>
 
-   <script>
+      <!-- Final Strong Binding -->
+    <script>
         window.addEventListener('load', () => {
-            console.log("🚀 Final Button Binding Active");
+            console.log("%c🚀 All Systems Ready - Binding Buttons", "color:lime; font-weight:bold");
 
-            // Strong button binding
-            const bindBtn = (id, handler) => {
-                const btn = document.getElementById(id);
-                if (btn) {
-                    btn.addEventListener('click', handler);
-                    console.log(`✅ Button ready: ${id}`);
-                }
-            };
+            // === THEME BUTTON ===
+            const btnTheme = document.getElementById('btnTheme');
+            if (btnTheme) {
+                btnTheme.addEventListener('click', () => {
+                    const current = document.documentElement.getAttribute('data-theme');
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('HT_THEME', next);
+                    btnTheme.textContent = next === 'dark' ? '☀️' : '🌙';
+                    console.log(`Theme switched to ${next}`);
+                });
+                console.log("✅ Theme button bound");
+            }
 
-            bindBtn('btnAdd', () => {
-                document.getElementById('entryModal').style.display = 'flex';
+            // === ADD ENTRY ===
+            document.getElementById('btnAdd')?.addEventListener('click', () => {
+                console.log("✅ Add Entry clicked");
+                const modal = document.getElementById('entryModal');
+                if (modal) modal.style.display = 'flex';
             });
 
-            bindBtn('btnSaveEntry', () => Action?.addEntry?.());
-            bindBtn('btnSaveCSV', () => Action?.exportCSV?.());
-            bindBtn('btnSavePDF', () => Action?.exportPDF?.());
-            bindBtn('btnRefresh', () => UI?.refreshTable?.());
-            bindBtn('btnFields', () => console.log("Fields clicked"));
-            bindBtn('btnThresholds', () => console.log("Thresholds clicked"));
-            bindBtn('btnOptions', () => console.log("Options clicked"));
+            // === SAVE ENTRY ===
+            document.getElementById('btnSaveEntry')?.addEventListener('click', () => {
+                console.log("✅ Save Entry clicked");
+                if (typeof Action !== "undefined") Action.addEntry();
+            });
 
-            // Initialize Chart
+            // === SAVE CSV ===
+            document.getElementById('btnSaveCSV')?.addEventListener('click', () => {
+                console.log("✅ Save CSV clicked");
+                if (typeof Action !== "undefined") Action.exportCSV();
+            });
+
+            // === SAVE PDF ===
+            document.getElementById('btnSavePDF')?.addEventListener('click', () => {
+                console.log("✅ Save PDF clicked");
+                if (typeof Action !== "undefined") Action.exportPDF();
+            });
+
+            // === REFRESH ===
+            document.getElementById('btnRefresh')?.addEventListener('click', () => {
+                console.log("✅ Refresh clicked");
+                if (typeof UI !== "undefined") UI.refreshTable();
+            });
+
+            // Initialize Chart safely
             if (typeof ChartManager !== "undefined") {
-                setTimeout(() => ChartManager.init(), 400);
+                setTimeout(() => ChartManager.init(), 300);
             }
         });
     </script>
+	
+	    <!-- Add Entry Modal -->
+    <div id="entryModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:10000; align-items:center; justify-content:center;">
+        <div style="background:#121a2a; padding:25px; border-radius:12px; width:90%; max-width:500px;">
+            <h2>Add Entry</h2>
+            <input type="date" id="f_date" style="width:100%; padding:12px; margin:10px 0;">
+            <input type="number" id="f_glucose" placeholder="Glucose mg/dL" style="width:100%; padding:12px; margin:10px 0;">
+            <br><br>
+            <button id="btnSaveEntry" class="btn ok">Save Entry</button>
+            <button onclick="document.getElementById('entryModal').style.display='none'" class="btn">Cancel</button>
+        </div>
+    </div>
+</body>
+</html>
 </body>
 </html>
