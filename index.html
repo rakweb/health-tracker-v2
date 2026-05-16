@@ -69,59 +69,42 @@
     <script src="./js/action.js" defer></script>
     <script src="./js/app.js" defer></script>
 
-      <!-- Final Strong Binding -->
-    <script>
+       <script>
         window.addEventListener('load', () => {
-            console.log("%c🚀 All Systems Ready - Binding Buttons", "color:lime; font-weight:bold");
+            console.log("%c🚀 Final Binding Active", "color:lime;font-weight:bold");
 
-            // === THEME BUTTON ===
+            // Theme
             const btnTheme = document.getElementById('btnTheme');
             if (btnTheme) {
                 btnTheme.addEventListener('click', () => {
-                    const current = document.documentElement.getAttribute('data-theme');
-                    const next = current === 'dark' ? 'light' : 'dark';
+                    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                    const next = isDark ? 'light' : 'dark';
                     document.documentElement.setAttribute('data-theme', next);
                     localStorage.setItem('HT_THEME', next);
                     btnTheme.textContent = next === 'dark' ? '☀️' : '🌙';
-                    console.log(`Theme switched to ${next}`);
                 });
-                console.log("✅ Theme button bound");
             }
 
-            // === ADD ENTRY ===
-            document.getElementById('btnAdd')?.addEventListener('click', () => {
-                console.log("✅ Add Entry clicked");
-                const modal = document.getElementById('entryModal');
-                if (modal) modal.style.display = 'flex';
+            // Main Buttons
+            const actions = {
+                'btnAdd': () => document.getElementById('entryModal').style.display = 'flex',
+                'btnSaveEntry': () => Action?.addEntry?.(),
+                'btnSaveCSV': () => Action?.exportCSV?.(),
+                'btnSavePDF': () => Action?.exportPDF?.(),
+                'btnRefresh': () => UI?.refreshTable?.()
+            };
+
+            Object.keys(actions).forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.addEventListener('click', actions[id]);
+                    console.log(`✅ Button active: ${id}`);
+                }
             });
 
-            // === SAVE ENTRY ===
-            document.getElementById('btnSaveEntry')?.addEventListener('click', () => {
-                console.log("✅ Save Entry clicked");
-                if (typeof Action !== "undefined") Action.addEntry();
-            });
-
-            // === SAVE CSV ===
-            document.getElementById('btnSaveCSV')?.addEventListener('click', () => {
-                console.log("✅ Save CSV clicked");
-                if (typeof Action !== "undefined") Action.exportCSV();
-            });
-
-            // === SAVE PDF ===
-            document.getElementById('btnSavePDF')?.addEventListener('click', () => {
-                console.log("✅ Save PDF clicked");
-                if (typeof Action !== "undefined") Action.exportPDF();
-            });
-
-            // === REFRESH ===
-            document.getElementById('btnRefresh')?.addEventListener('click', () => {
-                console.log("✅ Refresh clicked");
-                if (typeof UI !== "undefined") UI.refreshTable();
-            });
-
-            // Initialize Chart safely
+            // Init Chart
             if (typeof ChartManager !== "undefined") {
-                setTimeout(() => ChartManager.init(), 300);
+                setTimeout(() => ChartManager.init(), 400);
             }
         });
     </script>
