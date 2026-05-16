@@ -94,19 +94,48 @@
 
     <script>
         window.addEventListener('load', () => {
-            console.log('🚀 Health Tracker Fully Loaded - All modules should be ready');
-            
-            // Final safety binding
+            console.log('🚀 Health Tracker Fully Loaded');
+
+            // Final button bindings
             setTimeout(() => {
-                console.log("🔧 Final button binding pass");
                 document.getElementById('btnAdd')?.addEventListener('click', () => {
-                    console.log("✅ Add Entry clicked");
-                    const modal = document.getElementById('entryModal');
-                    if (modal) modal.style.display = 'flex';
+                    document.getElementById('entryModal').style.display = 'flex';
                 });
-            }, 1000);
+
+                document.getElementById('btnSaveEntry')?.addEventListener('click', () => {
+                    Action.addEntry();
+                });
+
+                document.getElementById('btnSaveCSV')?.addEventListener('click', () => Action.exportCSV());
+                document.getElementById('btnSavePDF')?.addEventListener('click', () => Action.exportPDF());
+                document.getElementById('btnRefresh')?.addEventListener('click', () => UI.refreshTable());
+            }, 600);
         });
+
+        // Global helper
+        window.UI = {
+            closeEntry() {
+                document.getElementById('entryModal').style.display = 'none';
+            }
+        };
     </script>
-      
+	
+    <!-- Simple Working Modal -->
+    <div id="entryModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; align-items:center; justify-content:center;">
+        <div style="background:#121a2a; padding:25px; border-radius:12px; width:90%; max-width:520px; border:1px solid #2a3a58;">
+            <h2 style="margin-top:0;">Add New Entry</h2>
+            
+            <label>Date</label>
+            <input type="date" id="f_date" style="width:100%; padding:10px; margin:8px 0; background:#0c1426; color:white; border:1px solid #2a3a58; border-radius:8px;">
+            
+            <label>Glucose (mg/dL)</label>
+            <input type="number" id="f_glucose" placeholder="e.g. 98" style="width:100%; padding:10px; margin:8px 0; background:#0c1426; color:white; border:1px solid #2a3a58; border-radius:8px;">
+            
+            <div style="margin-top:20px;">
+                <button id="btnSaveEntry" class="btn ok" style="margin-right:10px;">Save Entry</button>
+                <button onclick="UI.closeEntry()" class="btn">Cancel</button>
+            </div>
+        </div>
+    </div>      
 </body>
 </html>
