@@ -1,78 +1,48 @@
 // js/action.js
-const WorkerManager = {
-    worker: null,
-
-    init() {
-        if (!this.worker) {
-            this.worker = new Worker('./js/worker.js');
-            this.worker.onmessage = this.handleMessage.bind(this);
-        }
-    },
-
-    handleMessage(e) {
-        const { type, content, filename, message } = e.data;
-
-        if (type === 'CSV_READY') {
-            const blob = new Blob([content], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        if (type === 'ERROR') {
-            alert('Export Error: ' + message);
-        }
-    },
-
-    exportCSV(entries, fields = null) {
-        this.init();
-        this.worker.postMessage({ type: 'EXPORT_CSV', data: { entries, fields } });
-    },
-
-    exportPDF() {
-        this.init();
-        // For now we trigger PDF in main thread with light mode, but worker can prepare data
-        document.documentElement.setAttribute('data-pdf-export', '1');
-        setTimeout(() => {
-            document.documentElement.removeAttribute('data-pdf-export');
-        }, 2000);
-
-        alert("PDF generation started (light mode enabled)");
-        // Extend with jsPDF logic later
-    }
-};
+console.log("✅ action.js loaded");
 
 const Action = {
     async addEntry() {
         const entry = {
-            date: document.getElementById('f_date').value,
-            time: document.getElementById('f_time').value,
+            date: document.getElementById('f_date')?.value,
+            time: document.getElementById('f_time')?.value,
             glucose: parseFloat(document.getElementById('f_glucose')?.value) || null,
             sys: parseInt(document.getElementById('f_sys')?.value) || null,
             dia: parseInt(document.getElementById('f_dia')?.value) || null,
             weightLbs: parseFloat(document.getElementById('f_weightLbs')?.value) || null,
-            // Add more fields as needed
+            steps: parseInt(document.getElementById('f_steps')?.value) || null,
+            pain: parseFloat(document.getElementById('f_pain')?.value) || null,
+            symptoms: parseFloat(document.getElementById('f_symptoms')?.value) || null,
+            comments: document.getElementById('f_comments')?.value || '',
             timestamp: new Date().toISOString()
         };
 
-        const validation = Validator.entry(entry);
-        if (!validation.valid) {
-            alert(validation.errors.join('\n'));
+        if (!entry.date) {
+            alert("❌ Date is required!");
             return;
         }
 
-        await DB.addEntry(entry);
-        UI.refreshTable();
-        UI.closeEntry();
+        try {
+            await DB.addEntry(entry);
+            alert("✅ Entry saved successfully!");
+            UI.closeEntry();
+            UI.refreshTable();
+        } catch (err) {
+            console.error(err);
+            alert("❌ Failed to save entry");
+        }
     },
 
     exportCSV() {
-        // Example: get all entries (you can filter by date range later)
         DB.getAllEntries().then(entries => {
+            if (entries.length === 0) {
+                alert("No entries to export");
+                return;
+            }
             WorkerManager.exportCSV(entries);
+        }).catch(err => {
+            console.error(err);
+            alert("Failed to export CSV");
         });
     },
 
@@ -82,4 +52,3 @@ const Action = {
 };
 
 window.Action = Action;
-window.WorkerManager = WorkerManager;
