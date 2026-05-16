@@ -1,29 +1,29 @@
-export function buildChart(ctx, rows, metrics) {
-  const labels = rows.map(r => r.date);
+// js/chart.js
+let metricsChart = null;
 
-  return new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: metrics.map((k, i) => ({
-        label: k,
-        data: rows.map(r => r[k]),
-        borderColor: ['#60a5fa', '#34d399', '#f87171'][i],
-        pointRadius: 0,
-        tension: 0.3
-      }))
+const ChartManager = {
+    init() {
+        const ctx = document.getElementById('metricsChart');
+        if (!ctx) return;
+
+        metricsChart = new Chart(ctx, {
+            type: 'line',
+            data: { labels: [], datasets: [] },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' } },
+                scales: { y: { beginAtZero: false } }
+            }
+        });
     },
-    options: {
-      animation: false,
-      parsing: false,
-      normalized: true,
-      plugins: {
-        decimation: {
-          enabled: true,
-          algorithm: 'lttb',
-          samples: 200
-        }
-      }
+
+    update(data) {
+        if (!metricsChart) return;
+        metricsChart.data.labels = data.labels;
+        metricsChart.data.datasets = data.datasets;
+        metricsChart.update();
     }
-  });
-}
+};
+
+window.ChartManager = ChartManager;
