@@ -99,10 +99,40 @@
     <script src="./js/action.js" defer></script>
     <script src="./js/app.js" defer></script>
 
+    <!-- DIRECT BUTTON FIX -->
     <script>
+        function bindButtons() {
+            console.log("🔧 Binding buttons directly...");
+
+            const buttons = {
+                'btnAdd': () => { console.log("Add Entry clicked"); document.getElementById('entryModal').classList.add('show'); },
+                'btnSaveEntry': () => { console.log("Save Entry clicked"); Action?.addEntry(); },
+                'btnSaveCSV': () => { console.log("Save CSV clicked"); Action?.exportCSV(); },
+                'btnSavePDF': () => { console.log("Save PDF clicked"); Action?.exportPDF(); },
+                'btnRefresh': () => { console.log("Refresh clicked"); UI?.refreshTable(); },
+                'btnFields': () => { console.log("Fields clicked"); },
+                'btnThresholds': () => { console.log("Thresholds clicked"); },
+                'btnOptions': () => { console.log("Options clicked"); }
+            };
+
+            Object.keys(buttons).forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    // Remove old listeners first
+                    btn.replaceWith(btn.cloneNode(true));
+                    const freshBtn = document.getElementById(id);
+                    freshBtn.addEventListener('click', buttons[id]);
+                    console.log(`✅ Button ACTIVE: #${id}`);
+                } else {
+                    console.warn(`❌ Button MISSING: #${id}`);
+                }
+            });
+        }
+
+        // Run after everything loads
         window.addEventListener('load', () => {
             console.log('🚀 Health Tracker Fully Loaded');
-            if (typeof UI !== "undefined") UI.init();
+            setTimeout(bindButtons, 800);   // Give time for all modules
         });
     </script>
 </body>
