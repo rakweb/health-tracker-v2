@@ -7,6 +7,7 @@
     <meta name="theme-color" content="#0b1220" />
     <meta name="app-version" content="2.0.0">
 
+    <!-- Theme -->
     <script>
         (function () {
             const saved = localStorage.getItem('HT_THEME');
@@ -42,7 +43,7 @@
     </header>
 
     <main class="wrap">
-        <!-- Toolbar with ALL buttons -->
+        <!-- Toolbar -->
         <div class="toolbar card">
             <div class="row">
                 <button class="btn" id="btnRefresh">Refresh</button>
@@ -55,28 +56,29 @@
             </div>
         </div>
 
-        <!-- Chart Area -->
+        <!-- Chart -->
         <div class="card full-width" id="chartCard">
-            <canvas id="metricsChart" style="height: 340px; width:100%;"></canvas>
+            <h2>Metrics Chart</h2>
+            <canvas id="metricsChart" style="height: 360px; width: 100%;"></canvas>
         </div>
     </main>
 
-    <!-- Working Modal -->
-    <div id="entryModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:10000; align-items:center; justify-content:center;">
-        <div style="background:#121a2a; padding:25px; border-radius:12px; width:90%; max-width:500px; border:1px solid #2a3a58;">
-            <h2>Add Entry</h2>
-            <input type="date" id="f_date" style="width:100%; padding:12px; margin:10px 0; background:#0c1426; color:white; border:1px solid #35507f; border-radius:8px;">
-            <input type="number" id="f_glucose" placeholder="Glucose mg/dL" style="width:100%; padding:12px; margin:10px 0; background:#0c1426; color:white; border:1px solid #35507f; border-radius:8px;">
-            
-            <div style="margin-top:20px; display:flex; gap:10px;">
-                <button id="btnSaveEntry" class="btn ok">Save Entry</button>
+    <!-- Add Entry Modal -->
+    <div id="entryModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; align-items: center; justify-content: center;">
+        <div style="background: #121a2a; padding: 25px; border-radius: 12px; width: 90%; max-width: 520px; border: 1px solid #2a3a58;">
+            <h2>Add New Entry</h2>
+            <input type="date" id="f_date" style="width:100%; padding:12px; margin:10px 0;">
+            <input type="number" id="f_glucose" placeholder="Glucose (mg/dL)" style="width:100%; padding:12px; margin:10px 0;">
+            <div style="margin-top: 20px;">
+                <button id="btnSaveEntry" class="btn ok" style="margin-right: 12px;">Save Entry</button>
                 <button onclick="closeModal()" class="btn">Cancel</button>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Scripts - Correct Order -->
     <script src="./range-slider.js"></script>
+
     <script src="./js/config.js" defer></script>
     <script src="./js/db.js" defer></script>
     <script src="./js/validator.js" defer></script>
@@ -85,28 +87,36 @@
     <script src="./js/action.js" defer></script>
     <script src="./js/app.js" defer></script>
 
+    <!-- Final Direct Binding -->
     <script>
         window.addEventListener('load', () => {
-            console.log('🚀 Health Tracker Ready');
+            console.log('%c🚀 Health Tracker Fully Ready', 'color: lime; font-weight: bold');
 
-            // Direct button binding
-            document.getElementById('btnAdd').addEventListener('click', () => {
+            // Direct Button Binding
+            const bind = (id, fn) => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('click', fn);
+                else console.warn(`Button not found: ${id}`);
+            };
+
+            bind('btnAdd', () => {
                 document.getElementById('entryModal').style.display = 'flex';
             });
 
-            document.getElementById('btnSaveEntry').addEventListener('click', () => {
-                Action.addEntry();
-            });
+            bind('btnSaveEntry', () => Action.addEntry());
+            bind('btnSaveCSV', () => Action.exportCSV());
+            bind('btnSavePDF', () => Action.exportPDF());
+            bind('btnRefresh', () => UI.refreshTable());
 
-            document.getElementById('btnSaveCSV').addEventListener('click', () => Action.exportCSV());
-            document.getElementById('btnSavePDF').addEventListener('click', () => Action.exportPDF());
-            document.getElementById('btnRefresh').addEventListener('click', () => UI.refreshTable());
+            // Init Chart
+            if (typeof ChartManager !== 'undefined') {
+                setTimeout(() => ChartManager.init(), 300);
+            }
         });
 
         function closeModal() {
             document.getElementById('entryModal').style.display = 'none';
         }
-
         window.closeModal = closeModal;
     </script>
 </body>
