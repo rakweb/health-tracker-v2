@@ -1,40 +1,60 @@
-export const DB = {
-  db: null,
+// js/db.js
+let dbInstance = null;
 
-  async open() {
-    return new Promise((resolve, reject) => {
-      const req = indexedDB.open('health', 1);
+const DB = {
+    async init() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(CONFIG.DB_NAME, CONFIG.DB_VERSION);
 
-      req.onupgradeneeded = e => {
-        const db = e.target.result;
+            request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('entries')) {
+                    db.createObjectStore('entries', { keyPath: 'id', autoIncrement: true });
+                }
+            };
 
-        if (!db.objectStoreNames.contains('entries')) {
-          db.createObjectStore('entries', { keyPath: 'id', autoIncrement: true });
-        }
-      };
+            request.onsuccess = (e) => {
+                dbInstance = e.target.result;
+                console.log('✅ IndexedDB initialized');
+                resolve(dbInstance);
+            };
 
-      req.onsuccess = () => {
-        this.db = req.result;
-        resolve();
-      };
+            request.onerror = (e) => reject(e.target.error);
+        });
+    },
 
-      req.onerror = () => reject(req.error);
-    });
-  },
+    async addEntry(entry) {
+        const db = await this.init();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('entries', 'readwrite');
+            const store = tx.objectStore('entries');
+            const req = store.add(entry);
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+        });
+    },
 
-  async getAll() {
-    return new Promise(res => {
-      const tx = this.db.transaction('entries', 'readonly');
-      const req = tx.objectStore('entries').getAll();
-      req.onsuccess = () => res(req.result || []);
-    });
-  },
+    async getAllEntries() {
+        const db = await this.init();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('entries', 'readonly');
+            const store = tx.objectStore('entries');
+            const req = store.getAll();
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+        });
+    },
 
-  async save(entry) {
-    return new Promise(res => {
-      const tx = this.db.transaction('entries', 'readwrite');
-      tx.objectStore('entries').put(entry);
-      tx.oncomplete = () => res();
-    });
-  }
+    async deleteEntry(id) {
+        const db = await this.init();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('entries', 'readwrite');
+            const store = tx.objectStore('entries');
+            const req = store.delete(id);
+            req.onsuccess = () => resolve(true);
+            req.onerror = () => reject(req.error);
+        });
+    }
 };
+
+window.DB = DB;
