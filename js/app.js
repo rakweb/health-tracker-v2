@@ -1,11 +1,22 @@
 // js/app.js
-console.log("🚀 app.js loaded");
+console.log("🚀 app.js loaded - Single Binding");
 
 const UI = {
     init() {
-        console.log("✅ UI initialized");
+        console.log("✅ UI.init() running");
+
+        // Remove ALL previous listeners to prevent duplicates
+        this.clearAllListeners();
         this.bindButtons();
         this.refreshTable();
+    },
+
+    clearAllListeners() {
+        const saveBtn = document.getElementById('btnSaveEntry');
+        if (saveBtn) {
+            const newBtn = saveBtn.cloneNode(true);
+            saveBtn.parentNode.replaceChild(newBtn, saveBtn);
+        }
     },
 
     bindButtons() {
@@ -21,8 +32,7 @@ const UI = {
     },
 
     closeEntry() {
-        const modal = document.getElementById('entryModal');
-        if (modal) modal.style.display = 'none';
+        document.getElementById('entryModal').style.display = 'none';
     },
 
     async refreshTable() {
@@ -41,10 +51,10 @@ const UI = {
             `;
             tbody.appendChild(row);
         });
-
-        console.log(`📋 Table refreshed with ${entries.length} entries`);
     }
 };
 
 window.UI = UI;
+
+// Run only once
 window.addEventListener('load', () => UI.init());
