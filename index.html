@@ -16,7 +16,6 @@
     </script>
 
     <link rel="stylesheet" href="./css/base.css" />
-    <link rel="stylesheet" href="./css/styles.css" />
     <link rel="stylesheet" href="./css/theme-dark.css" />
     <link rel="stylesheet" href="./css/theme-light.css" />
     <link rel="stylesheet" href="./range-slider.css" />
@@ -29,45 +28,33 @@
         <div class="wrap headbar">
             <h1>Health Tracker</h1>
             <div>
-                <button id="btnAdd" class="btn ok">Add Entry</button>
-                <button id="btnSaveCSV" class="btn">Save CSV</button>
-                <button id="btnSavePDF" class="btn">Save PDF</button>
-                <button id="btnRefresh" class="btn">Refresh</button>
                 <button id="btnTheme" class="btn">🌙</button>
             </div>
         </div>
     </header>
 
-      <main class="wrap">
+    <main class="wrap">
         <!-- Toolbar -->
         <div class="toolbar card">
-            <div class="row">
-                <button class="btn" id="btnRefresh">Refresh</button>
-                <button class="btn" id="btnFields">Select Fields</button>
-                <button class="btn" id="btnThresholds">Thresholds</button>
-                <button class="btn" id="btnSaveCSV">Save CSV</button>
-                <button class="btn" id="btnSavePDF">Save PDF</button>
-                <button class="btn ok" id="btnAdd">Add Entry</button>
-            </div>
+            <button class="btn" id="btnRefresh">Refresh</button>
+            <button class="btn" id="btnSaveCSV">Save CSV</button>
+            <button class="btn" id="btnSavePDF">Save PDF</button>
+            <button class="btn ok" id="btnAdd">Add Entry</button>
         </div>
 
-        <!-- Entries Table FIRST -->
-        <div class="card full-width" id="entriesCard">
+        <!-- Table -->
+        <div class="card full-width">
             <h2>Entries</h2>
             <table style="width:100%; border-collapse: collapse;">
                 <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Glucose</th>
-                        <th>Time</th>
-                    </tr>
+                    <tr><th>Date</th><th>Glucose</th><th>Time</th></tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
             </table>
         </div>
 
-        <!-- Chart BELOW Table -->
-        <div class="card full-width" id="chartCard">
+        <!-- Chart -->
+        <div class="card full-width">
             <h2>Metrics Chart</h2>
             <div style="height: 380px; position: relative;">
                 <canvas id="metricsChart"></canvas>
@@ -75,19 +62,19 @@
         </div>
     </main>
 
-    <!-- Simple Modal -->
-    <div id="entryModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9999; align-items:center; justify-content:center;">
+    <!-- Modal -->
+    <div id="entryModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:10000; align-items:center; justify-content:center;">
         <div style="background:#121a2a; padding:25px; border-radius:12px; width:90%; max-width:500px;">
             <h2>Add Entry</h2>
             <input type="date" id="f_date" style="width:100%; padding:12px; margin:10px 0;">
-            <input type="number" id="f_glucose" placeholder="Glucose" style="width:100%; padding:12px; margin:10px 0;">
+            <input type="number" id="f_glucose" placeholder="Glucose mg/dL" style="width:100%; padding:12px; margin:10px 0;">
             <br><br>
-            <button id="btnSaveEntry" class="btn ok">Save</button>
-            <button onclick="document.getElementById('entryModal').style.display='none'" class="btn">Cancel</button>
+            <button id="btnSaveEntry" class="btn ok">Save Entry</button>
+            <button onclick="UI.closeEntry()" class="btn">Cancel</button>
         </div>
     </div>
 
-    <!-- All JS Files -->
+    <!-- Scripts -->
     <script src="./range-slider.js"></script>
     <script src="./js/config.js" defer></script>
     <script src="./js/db.js" defer></script>
@@ -97,75 +84,19 @@
     <script src="./js/action.js" defer></script>
     <script src="./js/app.js" defer></script>
 
-       <script>
+    <script>
         window.addEventListener('load', () => {
-            console.log("%c🚀 Final Binding Active", "color:lime;font-weight:bold");
+            console.log("🚀 Clean Start - Binding Buttons");
 
-            // Theme
-            const btnTheme = document.getElementById('btnTheme');
-            if (btnTheme) {
-                btnTheme.addEventListener('click', () => {
-                    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-                    const next = isDark ? 'light' : 'dark';
-                    document.documentElement.setAttribute('data-theme', next);
-                    localStorage.setItem('HT_THEME', next);
-                    btnTheme.textContent = next === 'dark' ? '☀️' : '🌙';
-                });
-            }
+            // Clean binding - one time only
+            document.getElementById('btnAdd').addEventListener('click', () => UI.showEntryModal());
+            document.getElementById('btnSaveEntry').addEventListener('click', () => Action.addEntry());
+            document.getElementById('btnSaveCSV').addEventListener('click', () => Action.exportCSV());
+            document.getElementById('btnSavePDF').addEventListener('click', () => Action.exportPDF());
+            document.getElementById('btnRefresh').addEventListener('click', () => UI.refreshTable());
 
-            // Main Buttons
-            const actions = {
-                'btnAdd': () => document.getElementById('entryModal').style.display = 'flex',
-                'btnSaveEntry': () => Action?.addEntry?.(),
-                'btnSaveCSV': () => Action?.exportCSV?.(),
-                'btnSavePDF': () => Action?.exportPDF?.(),
-                'btnRefresh': () => UI?.refreshTable?.()
-            };
-
-            Object.keys(actions).forEach(id => {
-                const btn = document.getElementById(id);
-                if (btn) {
-                    btn.addEventListener('click', actions[id]);
-                    console.log(`✅ Button active: ${id}`);
-                }
-            });
-
-            // Init Chart
-            if (typeof ChartManager !== "undefined") {
-                setTimeout(() => ChartManager.init(), 400);
-            }
+            ChartManager.init();
         });
     </script>
-	
-	    <!-- Add Entry Modal -->
-    <div id="entryModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:10000; align-items:center; justify-content:center;">
-        <div style="background:#121a2a; padding:25px; border-radius:12px; width:90%; max-width:500px;">
-            <h2>Add Entry</h2>
-            <input type="date" id="f_date" style="width:100%; padding:12px; margin:10px 0;">
-            <input type="number" id="f_glucose" placeholder="Glucose mg/dL" style="width:100%; padding:12px; margin:10px 0;">
-            <br><br>
-            <button id="btnSaveEntry" class="btn ok">Save Entry</button>
-            <button onclick="document.getElementById('entryModal').style.display='none'" class="btn">Cancel</button>
-        </div>
-    </div>
-	
-	    <script>
-        window.addEventListener('load', () => {
-            console.log("%c🛠️ DB Debug Tools Available", "color:orange");
-
-            // Global debug helpers
-            window.debugDB = {
-                showAll: async () => {
-                    const entries = await DB.getAllEntries();
-                    console.table(entries);
-                },
-                clearAll: () => DB.clearAllData()
-            };
-
-            console.log("Type debugDB.showAll() or debugDB.clearAll() in console");
-        });
-    </script>
-</body>
-</html>
 </body>
 </html>
