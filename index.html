@@ -84,19 +84,15 @@
     <script src="./js/action.js" defer></script>
     <script src="./js/app.js" defer></script>
 
-    <script>
+      <script>
+        // This should be the ONLY script at the bottom
         window.addEventListener('load', () => {
-            console.log("🚀 Clean Start - Binding Buttons");
-
-            // Clean binding - one time only
-            document.getElementById('btnAdd').addEventListener('click', () => UI.showEntryModal());
-            document.getElementById('btnSaveEntry').addEventListener('click', () => Action.addEntry());
-            document.getElementById('btnSaveCSV').addEventListener('click', () => Action.exportCSV());
-            document.getElementById('btnSavePDF').addEventListener('click', () => Action.exportPDF());
-            document.getElementById('btnRefresh').addEventListener('click', () => UI.refreshTable());
-
-            ChartManager.init();
+            if (typeof ChartManager !== "undefined") {
+                setTimeout(() => ChartManager.init(), 400);
+            }
         });
     </script>
+</body>
+</html>
 </body>
 </html>
